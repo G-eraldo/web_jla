@@ -10,7 +10,7 @@ const money = value => new Intl.NumberFormat('fr-FR', { style: 'currency', curre
 
 <template>
   <header class="sticky top-0 z-40 border-b border-[#e9ddd3] bg-[#fffaf6]">
-    <div class="bg-[#302722] px-3 py-2 text-center text-[9px] uppercase tracking-[.14em] text-white sm:text-[10px] sm:tracking-[.2em]">Livraison offerte dès 60 € · Fait avec amour en France</div>
+    <div class="bg-[#302722] px-3 py-2 text-center text-[9px] uppercase tracking-[.14em] text-white sm:text-[10px] sm:tracking-[.2em]">Livraison à domicile ou en point relais · Fait avec amour en France</div>
     <div class="relative mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 md:h-28">
       <button class="md:hidden" aria-label="Ouvrir le menu" @click="menuOpen = !menuOpen"><Menu class="h-5 w-5" /></button>
       <nav class="hidden gap-5 text-xs uppercase tracking-[.14em] md:flex lg:gap-7"><NuxtLink v-for="item in navigation" :key="item.label" :to="item.to">{{ item.label }}</NuxtLink></nav>
