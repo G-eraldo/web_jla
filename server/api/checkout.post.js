@@ -2,6 +2,11 @@ import { createMollieClient } from '@mollie/api-client'
 import { randomUUID } from 'node:crypto'
 import { products as demoProducts } from '~/data/products'
 
+const SHIPPING_PRICES = {
+  home: 6.9,
+  pickup: 4.9
+}
+
 function strapiHeaders() {
   const token = process.env.STRAPI_API_TOKEN
   if (!token) throw createError({ statusCode: 503, statusMessage: 'La boutique est en cours de configuration.' })
@@ -25,20 +30,21 @@ export default defineEventHandler(async event => {
   if (!['home', 'pickup'].includes(delivery.method) || (delivery.method === 'pickup' && (!String(delivery.pickupPoint || '').trim() || !/^\d{6}$/.test(String(delivery.pickupPointId || ''))))) throw createError({ statusCode: 400, statusMessage: 'Veuillez sélectionner un point relais Mondial Relay.' })
   if (!body?.acceptedTerms) throw createError({ statusCode: 400, statusMessage: 'Vous devez accepter les conditions générales de vente.' })
 
-  let catalog = demoProducts.map(product => ({ ...product, id: String(product.id) }))
+  let catalog = demoProducts.map(product => ({ ...product, id: String(product.id), stock: 10 }))
   try {
-    const response = await $fetch(`${config.public.strapiUrl.replace(/\/$/, '')}/api/products?fields[0]=name&fields[1]=price&pagination[pageSize]=100`)
-    if (response.data?.length) catalog = response.data.map(product => ({ id: String(product.documentId || product.id), name: product.name, price: Number(product.price) }))
+    const response = await $fetch(`${config.public.strapiUrl.replace(/\/$/, '')}/api/products?fields[0]=name&fields[1]=price&fields[2]=stock&pagination[pageSize]=100`)
+    if (response.data?.length) catalog = response.data.map(product => ({ id: String(product.documentId || product.id), name: product.name, price: Number(product.price), stock: Number(product.stock) }))
   } catch {}
 
   const items = lines.map(line => {
     const product = catalog.find(item => item.id === String(line.id))
     const quantity = Number(line.quantity)
     if (!product || !Number.isFinite(product.price) || !Number.isInteger(quantity) || quantity < 1 || quantity > 10) throw createError({ statusCode: 400, statusMessage: 'Votre panier contient un article invalide.' })
+    if (!Number.isInteger(product.stock) || product.stock < quantity) throw createError({ statusCode: 409, statusMessage: `Le stock de « ${product.name} » vient d’être mis à jour. Veuillez actualiser votre panier.` })
     return { product, quantity }
   })
   const subtotalAmount = items.reduce((sum, line) => sum + line.product.price * line.quantity, 0)
-  const shippingAmount = 0
+  const shippingAmount = SHIPPING_PRICES[delivery.method]
   const totalAmount = subtotalAmount + shippingAmount
   const strapiUrl = config.public.strapiUrl.replace(/\/$/, '')
   const reference = makeReference()
