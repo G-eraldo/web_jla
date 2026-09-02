@@ -12,7 +12,7 @@ const money = value => new Intl.NumberFormat('fr-FR', { style: 'currency', curre
   <header class="sticky top-0 z-40 border-b border-[#e9ddd3] bg-[#fffaf6]">
     <div
       class="bg-[#302722] px-3 py-2 text-center text-[9px] uppercase tracking-[.14em] text-white sm:text-[10px] sm:tracking-[.2em]">
-      Livraison à domicile ou en point relais ·</div>
+      Livraison à domicile ou en point relais</div>
     <div class="relative mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 md:h-28">
       <button class="md:hidden" aria-label="Ouvrir le menu" @click="menuOpen = !menuOpen">
         <Menu class="h-5 w-5" />
