@@ -6,7 +6,7 @@
             <div class="flex flex-col justify-center px-6 py-14 sm:px-10 sm:py-16 lg:px-24">
                 <p class="text-[10px] uppercase tracking-[.2em] text-[#9b712d] sm:text-xs">Bijoux fantaisie</p>
                 <h1 class="mt-5 max-w-xl font-serif text-5xl leading-[.98] sm:text-6xl lg:text-7xl">Des bijoux pensés
-                    pour vous !</h1>
+                    pour vous</h1>
                 <p class="mt-6 max-w-md text-sm leading-6 text-[#776b64]">Des bijoux solaires, colorés et délicats
                     imaginés pour faire pétiller chaque instant.</p>
                 <NuxtLink to="/collections/tous-les-bijoux"
