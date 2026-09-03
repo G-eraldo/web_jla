@@ -19,7 +19,7 @@ useSeoMeta({ title: `${product.name} — Maison JLA` })
         <p class="text-xs uppercase tracking-widest text-[#9b712d]">{{ product.category }}</p>
         <h1 class="mt-3 font-serif text-5xl">{{ product.name }}</h1>
         <p class="mt-4 font-serif text-2xl">{{ money(product.price) }}</p>
-        <p class="mt-6 text-sm leading-7 text-[#776b64]">{{ product.description }}</p>
+        <p class="mt-6 whitespace-pre-line text-sm leading-7 text-[#776b64]">{{ product.description }}</p>
         <p v-if="product.stock < 1" class="mt-6 text-sm font-medium text-[#9b712d]">Ce bijou est actuellement en rupture de stock.</p>
         <button class="mt-8 bg-[#302722] px-6 py-4 text-xs uppercase tracking-widest text-white disabled:cursor-not-allowed disabled:opacity-45" :disabled="product.stock < 1" @click="cart.addItem(product)">{{ product.stock < 1 ? 'Rupture de stock' : 'Ajouter au panier' }}</button>
       </div>
