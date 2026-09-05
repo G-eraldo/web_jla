@@ -109,7 +109,7 @@ onBeforeUnmount(() => clearTimeout(relaySearchTimer))
                     :checked="selectedRelayId === point.id" type="radio" name="relay-point" class="mt-1"><span><strong
                       class="block">{{ point.name }}</strong><span class="mt-1 block text-sm text-[#776b64]">{{
                         point.address.join(', ') }}<template v-if="point.address.length">, </template>{{
-                      point.postalCode }} {{ point.city }}<template v-if="point.distance"> · à {{
+                        point.postalCode }} {{ point.city }}<template v-if="point.distance"> · à {{
                         Math.round(point.distance / 1000 * 10) / 10 }} km</template></span></span></span></button>
             </div>
           </div>
@@ -119,13 +119,12 @@ onBeforeUnmount(() => clearTimeout(relaySearchTimer))
         <h2 class="font-serif text-2xl sm:text-3xl">Votre écrin</h2>
         <div class="my-6 border-y py-5">
           <div v-for="item in cart.items" :key="item.id" class="mb-3 flex justify-between gap-3 text-sm"><span>{{
-              item.name }}
+            item.name }}
               × {{ item.quantity }}</span><span class="shrink-0">{{ money(item.price * item.quantity) }}</span></div>
         </div>
         <div class="space-y-2 border-b pb-5 text-sm">
           <div class="flex justify-between"><span>Sous-total</span><span>{{ money(cart.total) }}</span></div>
-          <div class="flex justify-between"><span>Livraison {{ delivery.method === 'pickup' ? 'Mondial Relay' : 'à
-              domicile'
+          <div class="flex justify-between"><span>Livraison {{ delivery.method === 'pickup' ? 'Mondial Relay' : 'à domicile'
               }}</span><span>{{ money(shippingAmount) }}</span></div>
         </div>
         <div class="mt-5 flex justify-between font-serif text-xl sm:text-2xl"><span>Total</span><span>{{
