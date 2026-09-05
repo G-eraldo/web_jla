@@ -1,2 +1,14 @@
-<script setup>const route = useRoute(); const labels = { 'tous-les-bijoux': 'Tous les bijoux', colliers: 'Colliers', boucles: 'Boucles', bracelets: 'Bracelets' }; const { listProducts } = useStoreProducts(); const { data: products } = await useAsyncData(() => `collection-${route.params.slug}`, listProducts); const collection = computed(() => route.params.slug === 'tous-les-bijoux' ? products.value : products.value.filter(product => product.categorySlug === route.params.slug)); useSeoMeta({ title: () => `${labels[route.params.slug] || 'Boutique'} — Maison JLA` })</script>
-<template><section class="mx-auto max-w-7xl px-6 py-12 sm:px-8 sm:py-16"><p class="text-xs uppercase tracking-widest text-[#9b712d]">La boutique</p><h1 class="mt-3 font-serif text-4xl sm:text-5xl">{{ labels[route.params.slug] || 'La boutique' }}</h1><div v-if="collection.length" class="mt-8 grid grid-cols-1 gap-9 sm:mt-12 sm:grid-cols-2 sm:gap-6 md:grid-cols-3"><ProductCard v-for="product in collection" :key="product.id" :product="product" /></div><p v-else class="mt-8 bg-[#f5eee6] p-6 text-sm sm:mt-12">Aucun bijou n’est encore publié dans cette catégorie.</p></section></template>
+<script
+    setup>    const route = useRoute(); const labels = { 'tous-les-bijoux': 'Tous les bijoux', colliers: 'Colliers', boucles: 'Boucles', bracelets: 'Bracelets', bagues: 'Bagues' }; const { listProducts } = useStoreProducts(); const { data: products } = await useAsyncData(() => `collection-${route.params.slug}`, listProducts); const collection = computed(() => route.params.slug === 'tous-les-bijoux' ? products.value : products.value.filter(product => product.categorySlug === route.params.slug)); useSeoMeta({ title: () => `${labels[route.params.slug] || 'Boutique'} — Maison JLA` })</script>
+<template>
+    <section class="mx-auto max-w-7xl px-6 py-12 sm:px-8 sm:py-16">
+        <p class="text-xs uppercase tracking-widest text-[#9b712d]">La boutique</p>
+        <h1 class="mt-3 font-serif text-4xl sm:text-5xl">{{ labels[route.params.slug] || 'La boutique' }}</h1>
+        <div v-if="collection.length"
+            class="mt-8 grid grid-cols-1 gap-9 sm:mt-12 sm:grid-cols-2 sm:gap-6 md:grid-cols-3">
+            <ProductCard v-for="product in collection" :key="product.id" :product="product" />
+        </div>
+        <p v-else class="mt-8 bg-[#f5eee6] p-6 text-sm sm:mt-12">Aucun bijou n’est encore publié dans cette catégorie.
+        </p>
+    </section>
+</template>

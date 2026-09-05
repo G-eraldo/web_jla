@@ -4,7 +4,7 @@ import { Menu, ShoppingBag, X } from 'lucide-vue-next'
 const cart = useCartStore()
 const cartOpen = ref(false)
 const menuOpen = ref(false)
-const navigation = [{ label: 'Boutique', to: '/collections/tous-les-bijoux' }, { label: 'Colliers', to: '/collections/colliers' }, { label: 'Boucles', to: '/collections/boucles' }, { label: 'Bracelets', to: '/collections/bracelets' }]
+const navigation = [{ label: 'Boutique', to: '/collections/tous-les-bijoux' }, { label: 'Colliers', to: '/collections/colliers' }, { label: 'Boucles', to: '/collections/boucles' }, { label: 'Bracelets', to: '/collections/bracelets' }, { label: 'Bagues', to: '/collections/bagues' }]
 const money = value => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(value)
 </script>
 

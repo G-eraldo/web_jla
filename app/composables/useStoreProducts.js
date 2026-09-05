@@ -7,7 +7,8 @@ export function useStoreProducts() {
     "Un bijou Maison JLA imaginé pour illuminer le quotidien.";
 
   const getDescriptionText = (description) => {
-    if (typeof description === "string") return description.trim() || fallbackDescription;
+    if (typeof description === "string")
+      return description.trim() || fallbackDescription;
     if (!Array.isArray(description)) return fallbackDescription;
 
     const readNode = (node) => {

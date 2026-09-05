@@ -1,1 +1,21 @@
-<template><footer class="mt-12 bg-[#f6e7e6] px-6 py-12 sm:px-8 sm:py-14"><div class="mx-auto grid max-w-7xl gap-9 md:grid-cols-3 md:gap-10"><div><p class="font-serif text-3xl text-[#9b712d]">JLA</p><p class="mt-3 max-w-xs text-sm leading-6 text-[#776b64]">Des bijoux imaginés pour illuminer le quotidien.</p></div><div><p class="text-xs uppercase tracking-widest">Maison JLA</p><NuxtLink to="/collections/tous-les-bijoux" class="mt-3 block text-sm">La boutique</NuxtLink></div><div><p class="text-xs uppercase tracking-widest">Informations</p><NuxtLink to="/mentions-legales" class="mt-3 block text-sm">Mentions légales</NuxtLink><NuxtLink to="/politique-confidentialite" class="mt-2 block text-sm">Politique de confidentialité</NuxtLink></div></div></footer></template>
+<template>
+    <footer class="mt-12 bg-[#f6e7e6] px-6 py-12 sm:px-8 sm:py-14">
+        <div class="mx-auto grid max-w-7xl gap-9 md:grid-cols-3 md:gap-10">
+            <div>
+                <p class="font-serif text-3xl text-[#9b712d]">JLA</p>
+                <p class="mt-3 max-w-xs text-sm leading-6 text-[#776b64]">Des bijoux imaginés pour illuminer le
+                    quotidien.</p>
+            </div>
+            <div>
+                <p class="text-xs uppercase tracking-widest">Maison JLA</p>
+                <NuxtLink to="/collections/tous-les-bijoux" class="mt-3 block text-sm">La boutique</NuxtLink>
+            </div>
+            <div>
+                <p class="text-xs uppercase tracking-widest">Informations</p>
+                <NuxtLink to="/mentions-legales" class="mt-3 block text-sm">Mentions légales</NuxtLink>
+                <NuxtLink to="/politique-confidentialite" class="mt-2 block text-sm">Politique de confidentialité
+                </NuxtLink>
+            </div>
+        </div>
+    </footer>
+</template>
