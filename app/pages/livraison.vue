@@ -38,10 +38,11 @@ useSeoMeta({ title: 'Livraison & paiement — Maison JLA', description: 'Prépar
         <h2 class="font-serif text-2xl">Une question sur votre commande ?</h2>
         <p class="mt-3 text-sm leading-7 text-[#776b64]">Les coordonnées de Maison JLA sont disponibles dans les
           <NuxtLink to="/mentions-legales" class="underline underline-offset-4">mentions légales</NuxtLink>. Pensez à
-          préciser votre référence de commande.</p>
+          préciser votre référence de commande.
+        </p>
       </section>
     </div>
     <NuxtLink to="/collections/tous-les-bijoux" class="mt-8 inline-flex bg-[#302722] px-7 py-4 text-sm text-white">
-      Découvrir les bijoux ↗</NuxtLink>
+      Découvrir les bijoux</NuxtLink>
   </section>
 </template>
