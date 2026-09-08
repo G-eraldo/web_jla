@@ -6,17 +6,30 @@ useSeoMeta({ title: 'Merci pour votre commande — Maison JLA', robots: 'noindex
 const route = useRoute()
 const cart = useCartStore()
 const paymentStatus = ref('pending')
+let statusTimer
+let statusAttempts = 0
 
-onMounted(async () => {
-  if (typeof route.query.reference !== 'string' || !route.query.reference) return
-  cart.clearCart()
+async function refreshPaymentStatus(reference) {
   try {
-    const result = await $fetch('/api/mollie/status', { query: { reference: route.query.reference } })
+    const result = await $fetch('/api/mollie/status', { query: { reference } })
     paymentStatus.value = result.status
   } catch {
     paymentStatus.value = 'pending'
   }
+
+  statusAttempts += 1
+  if (paymentStatus.value !== 'paid' && statusAttempts < 6) {
+    statusTimer = setTimeout(() => refreshPaymentStatus(reference), 2000)
+  }
+}
+
+onMounted(() => {
+  if (typeof route.query.reference !== 'string' || !route.query.reference) return
+  cart.clearCart()
+  refreshPaymentStatus(route.query.reference)
 })
+
+onBeforeUnmount(() => clearTimeout(statusTimer))
 </script>
 
 <template>
