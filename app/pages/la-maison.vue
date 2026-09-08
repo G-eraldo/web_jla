@@ -14,7 +14,8 @@ useSeoMeta({ title: 'L’esprit Maison JLA', description: 'Découvrez l’univer
       <div class="space-y-5 text-sm leading-7 text-[#776b64]">
         <p>Il y a les bijoux que l’on offre et ceux que l’on s’offre. Ceux que l’on choisit pour leur éclat, leur
           couleur, ou simplement parce qu’ils nous plaisent.</p>
-        <p>C’est cet esprit que vous retrouvez chez Maison JLA : des bijoux fantaisie à porter à votre façon. Colliers,
+        <p>C’est cet esprit que vous retrouvez chez Maison JLA : des bijoux fantaisie en acier inoxydable à porter à
+          votre façon. Colliers,
           bracelets, bagues et boucles d’oreilles se rencontrent dans une collection à explorer au fil de vos envies.
         </p>
         <NuxtLink to="/collections/tous-les-bijoux" class="inline-flex bg-[#302722] px-6 py-3 text-white">Explorer la
