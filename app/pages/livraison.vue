@@ -8,7 +8,7 @@ useSeoMeta({ title: 'Livraison & paiement — Maison JLA', description: 'Livrais
     <h1 class="mt-4 font-serif text-4xl sm:text-5xl">Livraison & paiement</h1>
     <p class="mt-5 max-w-2xl text-sm leading-7 text-[#776b64]">En France métropolitaine, la livraison vous est offerte
       dès 60 € d’achat, à domicile comme en point relais. En dessous de ce montant, choisissez l’option qui vous
-      convient.</p>
+      convient. Le délai prévu est de 3 à 6 jours ouvrés à compter de la confirmation du paiement.</p>
     <div class="my-10 grid gap-5 sm:grid-cols-2">
       <section class="bg-[#f2e9e2] p-7">
         <p class="text-xs uppercase tracking-widest">En point relais</p>

@@ -138,11 +138,10 @@ onBeforeUnmount(() => clearTimeout(relaySearchTimer))
         <div class="mt-5 flex justify-between font-serif text-xl sm:text-2xl"><span>Total</span><span>{{
           money(totalAmount)
             }}</span></div>
-        <p class="mt-3 text-sm text-[#776b64]">Paiement sécurisé par Mollie. La confirmation vous sera envoyée après
-          validation du paiement.</p><label class="mt-5 flex gap-3 text-sm leading-5"><input v-model="acceptedTerms"
-            required type="checkbox" class="mt-1"><span>J’accepte les conditions générales de vente et reconnais avoir
-            lu la politique
-            de confidentialité.</span></label>
+        <p class="mt-3 text-sm text-[#776b64]">Paiement sécurisé par Mollie. Après validation, l’e-mail de confirmation comprendra votre récapitulatif, votre facture et les CGV applicables.</p>
+        <p class="mt-3 text-xs leading-5 text-[#776b64]">Livraison prévue sous 3 à 6 jours ouvrés à compter de la confirmation du paiement.</p>
+        <label class="mt-5 flex gap-3 text-sm leading-5"><input v-model="acceptedTerms"
+            required type="checkbox" class="mt-1"><span>J’accepte les <NuxtLink class="font-medium underline underline-offset-4" to="/conditions-generales-de-vente" target="_blank">conditions générales de vente</NuxtLink> et reconnais avoir lu la <NuxtLink class="font-medium underline underline-offset-4" to="/politique-confidentialite" target="_blank">politique de confidentialité</NuxtLink>.</span></label>
         <p v-if="errorMessage" class="mt-5 text-sm text-red-600">{{ errorMessage }}</p><button
           class="mt-6 w-full bg-[#302722] py-4 text-xs uppercase tracking-widest text-white disabled:cursor-not-allowed disabled:opacity-60"
           :disabled="loading">{{ loading ? 'Redirection…' : 'Payer — commande avec obligation de paiement' }}</button>
