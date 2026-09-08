@@ -44,7 +44,7 @@ const hero = computed(() => selection.value.find(product => product.categorySlug
 
     <div class="border-b border-[#e9ddd3] px-6 py-5">
       <div class="mx-auto grid max-w-5xl gap-3 text-center text-[11px] text-[#776b64] sm:grid-cols-3"><span>Paiement
-          sécurisé avec Mollie</span><span>Livraison à domicile ou en point relais</span><span>Confirmation de commande
+          sécurisé avec Mollie</span><span>Livraison offerte dès 60 € d’achat</span><span>Confirmation de commande
           par e-mail</span></div>
     </div>
 

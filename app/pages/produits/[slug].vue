@@ -69,7 +69,7 @@ useSeoMeta({
           <p class="mt-4 text-center text-[11px] text-[#776b64]">Paiement sécurisé par Mollie</p>
           <div class="mt-8 border-y border-[#e9ddd3] py-5">
             <p class="text-sm">À votre porte, ou tout près de chez vous.</p>
-            <p class="mt-2 text-xs leading-6 text-[#776b64]">Choisissez la livraison à domicile ou en point relais lors de votre commande.</p>
+            <p class="mt-2 text-xs leading-6 text-[#776b64]">À domicile ou en point relais, la livraison est offerte dès 60 € d’achat.</p>
             <NuxtLink to="/livraison" class="mt-2 inline-flex min-h-8 items-center text-xs underline underline-offset-4">Tout savoir sur la livraison</NuxtLink>
           </div>
         </div>

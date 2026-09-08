@@ -1,11 +1,7 @@
 import { createMollieClient } from '@mollie/api-client'
 import { randomUUID } from 'node:crypto'
 import { products as demoProducts } from '~/data/products'
-
-const SHIPPING_PRICES = {
-  home: 6.9,
-  pickup: 4.9
-}
+import { shippingAmountFor } from '~/lib/shipping'
 
 function strapiHeaders() {
   const token = process.env.STRAPI_API_TOKEN
@@ -44,7 +40,7 @@ export default defineEventHandler(async event => {
     return { product, quantity }
   })
   const subtotalAmount = items.reduce((sum, line) => sum + line.product.price * line.quantity, 0)
-  const shippingAmount = SHIPPING_PRICES[delivery.method]
+  const shippingAmount = shippingAmountFor(delivery.method, subtotalAmount)
   const totalAmount = subtotalAmount + shippingAmount
   const strapiUrl = config.public.strapiUrl.replace(/\/$/, '')
   const reference = makeReference()

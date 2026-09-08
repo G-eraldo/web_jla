@@ -1,5 +1,6 @@
 <script setup>
 import { ArrowRight, Menu, ShoppingBag, X } from 'lucide-vue-next'
+import { amountUntilFreeShipping } from '~/lib/shipping'
 
 const cart = useCartStore()
 const route = useRoute()
@@ -14,6 +15,7 @@ const navigation = [
   { label: 'La Maison', to: '/la-maison' }
 ]
 const money = value => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(value)
+const freeShippingRemaining = computed(() => amountUntilFreeShipping(cart.total))
 const openCart = () => {
   menuOpen.value = false
   cartDialog.value?.showModal()
@@ -28,8 +30,8 @@ watch(() => route.fullPath, () => {
 <template>
   <header class="sticky top-0 z-40 border-b border-[#e9ddd3] bg-[#fffaf6]/95 backdrop-blur-md">
     <div class="bg-[#302722] px-4 py-2.5 text-center text-[10px] tracking-[.12em] text-[#fffaf6] sm:text-xs">
-      De petits bijoux. De grandes histoires. <span class="hidden sm:inline">— Livraison à domicile & en point
-        relais</span>
+      <NuxtLink to="/livraison">Livraison offerte dès 60 € d’achat <span class="hidden sm:inline">— à domicile ou en
+          point relais</span></NuxtLink>
     </div>
     <div class="relative mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8 md:h-24">
       <button type="button"
@@ -113,7 +115,11 @@ watch(() => route.fullPath, () => {
         <div v-if="cart.items.length" class="border-t border-[#e9ddd3] pt-5">
           <div class="flex items-center justify-between text-base"><span>Sous-total</span><span>{{ money(cart.total)
               }}</span></div>
-          <p class="mt-2 text-xs leading-5 text-[#776b64]">Frais de livraison calculés à l’étape suivante.</p>
+          <p aria-live="polite" class="mt-2 text-xs leading-5 text-[#776b64]">
+            <template v-if="freeShippingRemaining">Encore {{ money(freeShippingRemaining) }} pour profiter de la
+              livraison offerte.</template>
+            <template v-else>Bonne nouvelle, la livraison vous est offerte.</template>
+          </p>
           <NuxtLink to="/checkout"
             class="mt-5 flex min-h-14 items-center justify-center gap-3 bg-[#302722] px-4 text-sm text-white transition hover:bg-[#514137]"
             @click="closeCart">Passer commande

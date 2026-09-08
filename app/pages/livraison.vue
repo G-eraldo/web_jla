@@ -1,25 +1,26 @@
 <script setup>
 definePageMeta({ layout: 'default' })
-useSeoMeta({ title: 'Livraison & paiement — Maison JLA', description: 'Préparez votre commande Maison JLA : livraison en point relais ou à domicile, paiement sécurisé et confirmation par e-mail.' })
+useSeoMeta({ title: 'Livraison & paiement — Maison JLA', description: 'Livraison offerte dès 60 € d’achat en France métropolitaine, à domicile ou en point relais, et paiement sécurisé.' })
 </script>
 <template>
   <section class="mx-auto max-w-5xl px-6 py-14 sm:py-20">
     <p class="text-[10px] uppercase tracking-[.22em] text-[#9b712d]">Pour commander sereinement</p>
     <h1 class="mt-4 font-serif text-4xl sm:text-5xl">Livraison & paiement</h1>
-    <p class="mt-5 max-w-xl text-sm leading-7 text-[#776b64]">Toutes les informations utiles avant de choisir votre
-      prochain coup de cœur.</p>
+    <p class="mt-5 max-w-2xl text-sm leading-7 text-[#776b64]">En France métropolitaine, la livraison vous est offerte
+      dès 60 € d’achat, à domicile comme en point relais. En dessous de ce montant, choisissez l’option qui vous
+      convient.</p>
     <div class="my-10 grid gap-5 sm:grid-cols-2">
       <section class="bg-[#f2e9e2] p-7">
         <p class="text-xs uppercase tracking-widest">En point relais</p>
         <h2 class="mt-3 font-serif text-3xl">Mondial Relay · 4,90 €</h2>
         <p class="mt-4 text-sm leading-7 text-[#776b64]">Choisissez votre point relais lors de la commande, à partir de
-          votre code postal.</p>
+          votre code postal. Livraison offerte dès 60 € d’achat.</p>
       </section>
       <section class="bg-[#f2e2de] p-7">
         <p class="text-xs uppercase tracking-widest">Chez vous</p>
         <h2 class="mt-3 font-serif text-3xl">À domicile · 6,90 €</h2>
         <p class="mt-4 text-sm leading-7 text-[#776b64]">Renseignez votre adresse de livraison. Les frais sont affichés
-          dans le récapitulatif avant le paiement.</p>
+          dans le récapitulatif avant le paiement et offerts dès 60 € d’achat.</p>
       </section>
     </div>
     <div class="divide-y divide-[#e9ddd3]">

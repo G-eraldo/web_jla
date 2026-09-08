@@ -16,7 +16,7 @@ import { LockKeyhole, Package, Truck } from 'lucide-vue-next';
         <div class="flex items-center gap-4 sm:justify-center">
           <Truck class="h-5 w-5 shrink-0 text-[#986c35]" />
           <div>
-            <p class="text-sm">Livraison à votre rythme</p>
+            <p class="text-sm">Livraison offerte dès 60 €</p>
             <p class="mt-1 text-xs text-[#776b64]">À domicile ou en point relais</p>
           </div>
         </div>

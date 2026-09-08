@@ -1,4 +1,6 @@
 <script setup>
+import { amountUntilFreeShipping, shippingAmountFor, SHIPPING_PRICES } from '~/lib/shipping'
+
 const cart = useCartStore()
 const form = reactive({ firstName: '', lastName: '', email: '', phone: '', addressLine1: '', addressLine2: '', postalCode: '', city: '' })
 const delivery = reactive({ method: 'home', pickupPoint: '', pickupPointId: '' })
@@ -11,7 +13,9 @@ const relayLoading = ref(false)
 const relayError = ref('')
 let relaySearchTimer
 const money = value => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(value)
-const shippingAmount = computed(() => delivery.method === 'pickup' ? 4.9 : 6.9)
+const shippingAmount = computed(() => shippingAmountFor(delivery.method, cart.total))
+const freeShippingRemaining = computed(() => amountUntilFreeShipping(cart.total))
+const hasFreeShipping = computed(() => freeShippingRemaining.value === 0)
 const totalAmount = computed(() => cart.total + shippingAmount.value)
 
 useSeoMeta({ title: 'Finaliser ma commande — Maison JLA', description: 'Renseignez vos coordonnées et finalisez votre commande Maison JLA en toute sécurité.' })
@@ -89,14 +93,18 @@ onBeforeUnmount(() => clearTimeout(relaySearchTimer))
           <div class="mt-6 grid gap-3 sm:grid-cols-2"><label class="flex cursor-pointer gap-3 border p-4"
               :class="delivery.method === 'home' ? 'border-[#9b712d] bg-[#fdf7f2]' : 'border-[#e9ddd3]'"><input
                 v-model="delivery.method" value="home" type="radio" name="delivery-method"><span><strong
-                  class="block font-medium">À domicile · {{ money(6.9) }}</strong><span
+                  class="block font-medium">À domicile · {{ hasFreeShipping ? 'Offerte' : money(SHIPPING_PRICES.home) }}</strong><span
                   class="mt-1 block text-sm text-[#776b64]">À l’adresse indiquée, en France
                   métropolitaine.</span></span></label><label class="flex cursor-pointer gap-3 border p-4"
               :class="delivery.method === 'pickup' ? 'border-[#9b712d] bg-[#fdf7f2]' : 'border-[#e9ddd3]'"><input
                 v-model="delivery.method" value="pickup" type="radio" name="delivery-method"><span><strong
-                  class="block font-medium">Mondial Relay · {{ money(4.9) }}</strong><span
+                  class="block font-medium">Mondial Relay · {{ hasFreeShipping ? 'Offerte' : money(SHIPPING_PRICES.pickup) }}</strong><span
                   class="mt-1 block text-sm text-[#776b64]">Choisissez un point relais disponible.</span></span></label>
           </div>
+          <p aria-live="polite" class="mt-3 text-sm text-[#776b64]">
+            <template v-if="hasFreeShipping">Bonne nouvelle, la livraison vous est offerte.</template>
+            <template v-else>Encore {{ money(freeShippingRemaining) }} pour profiter de la livraison offerte.</template>
+          </p>
           <div v-if="delivery.method === 'pickup'" class="mt-4">
             <p v-if="!/^\d{5}$/.test(form.postalCode)" class="text-sm text-[#776b64]">Renseignez d’abord votre code
               postal pour voir les points relais disponibles.</p>
@@ -125,7 +133,7 @@ onBeforeUnmount(() => clearTimeout(relaySearchTimer))
         <div class="space-y-2 border-b pb-5 text-sm">
           <div class="flex justify-between"><span>Sous-total</span><span>{{ money(cart.total) }}</span></div>
           <div class="flex justify-between"><span>Livraison {{ delivery.method === 'pickup' ? 'Mondial Relay' : 'à domicile'
-              }}</span><span>{{ money(shippingAmount) }}</span></div>
+              }}</span><span>{{ hasFreeShipping ? 'Offerte' : money(shippingAmount) }}</span></div>
         </div>
         <div class="mt-5 flex justify-between font-serif text-xl sm:text-2xl"><span>Total</span><span>{{
           money(totalAmount)
