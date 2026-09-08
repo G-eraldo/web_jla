@@ -8,8 +8,8 @@ import {
 } from '../app/lib/shipping.js'
 
 test('applique les tarifs de livraison sous le seuil de 60 €', () => {
-  assert.equal(shippingAmountFor('pickup', 59.99), 4.9)
-  assert.equal(shippingAmountFor('home', 59.99), 6.9)
+  assert.equal(shippingAmountFor('pickup', 59.99), 3.9)
+  assert.equal(shippingAmountFor('home', 59.99), 7.9)
   assert.equal(qualifiesForFreeShipping(59.99), false)
   assert.equal(amountUntilFreeShipping(59.99), 0.01)
 })

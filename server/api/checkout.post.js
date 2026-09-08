@@ -2,6 +2,7 @@ import { createMollieClient } from '@mollie/api-client'
 import { randomUUID } from 'node:crypto'
 import { products as demoProducts } from '~/data/products'
 import { shippingAmountFor } from '~/lib/shipping'
+import { isValidPickupSelection } from '../utils/delivery.js'
 
 function strapiHeaders() {
   const token = process.env.STRAPI_API_TOKEN
@@ -23,7 +24,7 @@ export default defineEventHandler(async event => {
   const delivery = body?.delivery || {}
   const requiredCustomerFields = ['firstName', 'lastName', 'email', 'phone', 'addressLine1', 'postalCode', 'city']
   if (!lines.length || requiredCustomerFields.some(field => !String(customer[field] || '').trim())) throw createError({ statusCode: 400, statusMessage: 'Veuillez compléter vos informations de livraison.' })
-  if (!['home', 'pickup'].includes(delivery.method) || (delivery.method === 'pickup' && (!String(delivery.pickupPoint || '').trim() || !/^\d{6}$/.test(String(delivery.pickupPointId || ''))))) throw createError({ statusCode: 400, statusMessage: 'Veuillez sélectionner un point relais Mondial Relay.' })
+  if (!['home', 'pickup'].includes(delivery.method) || !isValidPickupSelection(delivery)) throw createError({ statusCode: 400, statusMessage: 'Veuillez sélectionner un point relais Mondial Relay.' })
   if (!body?.acceptedTerms) throw createError({ statusCode: 400, statusMessage: 'Vous devez accepter les conditions générales de vente.' })
 
   let catalog = demoProducts.map(product => ({ ...product, id: String(product.id), stock: 10 }))

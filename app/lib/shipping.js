@@ -1,8 +1,8 @@
 export const FREE_SHIPPING_THRESHOLD = 60
 
 export const SHIPPING_PRICES = Object.freeze({
-  home: 6.9,
-  pickup: 4.9
+  home: 7.9,
+  pickup: 3.9
 })
 
 const FREE_SHIPPING_THRESHOLD_CENTS = FREE_SHIPPING_THRESHOLD * 100

@@ -6,9 +6,11 @@
 - [ ] Configurer une clé Mollie de test, puis une clé live, dans `MOLLIE_API_KEY`.
 - [ ] Vérifier que `NUXT_PUBLIC_SITE_URL` correspond exactement au domaine HTTPS de production. C’est l’URL appelée par le webhook Mollie.
 - [ ] Effectuer un paiement test et vérifier : commande créée `pending` → paiement `paid` → e-mail de confirmation reçu une seule fois.
+- [ ] Configurer les mêmes `SENDCLOUD_PUBLIC_KEY` et `SENDCLOUD_SECRET_KEY` côté Nuxt et Strapi, puis renseigner `SENDCLOUD_INTEGRATION_ID` côté Strapi avec l’identifiant de l’intégration « maisonJLa ».
+- [ ] Après un paiement test, vérifier que la commande payée apparaît une seule fois dans Sendcloud, onglet **Commande(s) importée(s)**, avec l’adresse, les articles et le point relais éventuel.
 - [ ] Renseigner un numéro de suivi dans une commande Strapi test et vérifier l’e-mail d’expédition, son lien de suivi et l’absence de doublon.
 - [ ] Définir clairement la politique de frais et délais : domicile, point relais, livraison offerte, zones desservies, transporteur et retours.
-- [ ] Définir le transporteur et la méthode de sélection réelle du point relais. Le champ actuel permet une saisie manuelle ; un sélecteur automatique nécessitera l’API du transporteur choisi.
+- [x] Sélectionner les points relais Mondial Relay depuis l’API Sendcloud et transmettre le point choisi avec la commande importée.
 
 ## E-mails
 
