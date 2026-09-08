@@ -12,13 +12,13 @@ useSeoMeta({ title: 'Livraison & paiement — Maison JLA', description: 'Livrais
     <div class="my-10 grid gap-5 sm:grid-cols-2">
       <section class="bg-[#f2e9e2] p-7">
         <p class="text-xs uppercase tracking-widest">En point relais</p>
-        <h2 class="mt-3 font-serif text-3xl">Mondial Relay · 4,90 €</h2>
+        <h2 class="mt-3 font-serif text-3xl">Mondial Relay · 3,90 €</h2>
         <p class="mt-4 text-sm leading-7 text-[#776b64]">Choisissez votre point relais lors de la commande, à partir de
           votre code postal. Livraison offerte dès 60 € d’achat.</p>
       </section>
       <section class="bg-[#f2e2de] p-7">
         <p class="text-xs uppercase tracking-widest">Chez vous</p>
-        <h2 class="mt-3 font-serif text-3xl">À domicile · 6,90 €</h2>
+        <h2 class="mt-3 font-serif text-3xl">À domicile · 7,90 €</h2>
         <p class="mt-4 text-sm leading-7 text-[#776b64]">Renseignez votre adresse de livraison. Les frais sont affichés
           dans le récapitulatif avant le paiement et offerts dès 60 € d’achat.</p>
       </section>
