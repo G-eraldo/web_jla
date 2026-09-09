@@ -87,7 +87,7 @@ export function useStoreProducts() {
           manufacturerBrand: "Maison JLA",
           manufacturerCompany: "Touret Julia",
           manufacturerPostalAddress: "5 rue Joliot Curie\n80200 Flamicourt\nFrance",
-          manufacturerEmail: "maisonjla@outlook.fr",
+          manufacturerEmail: "maisonjla@outlook.com",
           safetyWarnings: "Démonstration locale uniquement.",
         },
       }),

@@ -36,7 +36,7 @@ test('prépare un e-mail Maison JLA sûr pour la bonne destinataire', () => {
   })
   const email = buildContactEmail(data)
 
-  assert.equal(email.to, 'maisonjla@outlook.fr')
+  assert.equal(email.to, 'maisonjla@outlook.com')
   assert.equal(email.replyTo, 'jeanne@example.com')
   assert.match(email.html, /background:#f5eee6/)
   assert.match(email.html, /font-family:Georgia,serif/)

@@ -27,8 +27,8 @@ export default defineEventHandler(async event => {
 
   const apiKey = process.env.RESEND_API_KEY
   const from = process.env.RESEND_FROM
-  const sellerEmail = process.env.RETRACTATION_TO || 'maisonjla@outlook.fr'
-  if (!apiKey || !from) throw createError({ statusCode: 503, statusMessage: 'L’envoi est temporairement indisponible. Écrivez à maisonjla@outlook.fr.' })
+  const sellerEmail = process.env.RETRACTATION_TO || 'maisonjla@outlook.com'
+  if (!apiKey || !from) throw createError({ statusCode: 503, statusMessage: 'L’envoi est temporairement indisponible. Écrivez à maisonjla@outlook.com.' })
 
   const sentAtDate = new Date()
   const sentAt = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeStyle: 'long', timeZone: 'Europe/Paris' }).format(sentAtDate)

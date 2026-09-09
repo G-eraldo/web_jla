@@ -15,7 +15,7 @@ export function withdrawalFingerprint(declaration) {
 }
 
 export async function persistWithdrawal({ strapiUrl, token, declaration, declaredAt }) {
-  if (!token) throw createError({ statusCode: 503, statusMessage: 'Le service de rétractation est temporairement indisponible. Écrivez à maisonjla@outlook.fr.' })
+  if (!token) throw createError({ statusCode: 503, statusMessage: 'Le service de rétractation est temporairement indisponible. Écrivez à maisonjla@outlook.com.' })
   const baseUrl = strapiUrl.replace(/\/$/, '')
   const fingerprint = withdrawalFingerprint(declaration)
   const headers = { Authorization: `Bearer ${token}` }
