@@ -8,7 +8,9 @@
 - [ ] Effectuer un paiement test et vérifier : commande créée `pending` → paiement `paid` → e-mail de confirmation reçu une seule fois.
 - [ ] Configurer les mêmes `SENDCLOUD_PUBLIC_KEY` et `SENDCLOUD_SECRET_KEY` côté Nuxt et Strapi, puis renseigner `SENDCLOUD_INTEGRATION_ID` côté Strapi avec l’identifiant de l’intégration « maisonJLa ».
 - [ ] Après un paiement test, vérifier que la commande payée apparaît une seule fois dans Sendcloud, onglet **Commande(s) importée(s)**, avec l’adresse, les articles et le point relais éventuel.
-- [ ] Renseigner un numéro de suivi dans une commande Strapi test et vérifier l’e-mail d’expédition, son lien de suivi et l’absence de doublon.
+- [ ] Dans Sendcloud, activer **Feedback des Webhooks**, saisir `https://back.maisonjla.fr/api/sendcloud/webhook`, puis lancer **Test API Webhook**.
+- [ ] Dans Sendcloud, désactiver le bouton global **Envoyer des e-mails de suivi aux clients** : Sendcloud remonte les statuts, mais n’envoie aucun e-mail client.
+- [ ] Générer une étiquette test et vérifier dans Strapi la remontée du suivi et des statuts `processing` → `shipped` → `delivered`.
 - [ ] Définir clairement la politique de frais et délais : domicile, point relais, livraison offerte, zones desservies, transporteur et retours.
 - [x] Sélectionner les points relais Mondial Relay depuis l’API Sendcloud et transmettre le point choisi avec la commande importée.
 
@@ -16,6 +18,8 @@
 
 - [ ] Vérifier le domaine d’envoi dans Resend (SPF/DKIM) et configurer `RESEND_FROM` avec l’adresse Maison JLA.
 - [ ] Vérifier `RESEND_REPLY_TO` et envoyer des tests vers Gmail, Outlook et iCloud.
+- [x] Utiliser Strapi et Resend comme unique expéditeur des confirmations et notifications logistiques ; Sendcloud ne fournit que les événements signés.
+- [ ] Vérifier qu’un même webhook rejoué ne renvoie pas le même e-mail et qu’une livraison déjà confirmée ne régresse pas sur un ancien statut.
 - [ ] Ajouter une adresse de contact/SAV visible dans les e-mails et les pages légales.
 
 ## Légal et RGPD (France)

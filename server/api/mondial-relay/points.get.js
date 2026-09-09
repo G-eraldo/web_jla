@@ -1,3 +1,5 @@
+import { findMondialRelayPoints } from '../../utils/sendcloud-service-points.js'
+
 export default defineEventHandler(async (event) => {
   const { postalCode } = getQuery(event);
 
@@ -10,70 +12,14 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const publicKey = process.env.SENDCLOUD_PUBLIC_KEY;
-  const secretKey = process.env.SENDCLOUD_SECRET_KEY;
-
-  if (!publicKey || !secretKey) {
-    throw createError({
-      statusCode: 503,
-      statusMessage:
-        "La recherche de points relais est en cours de configuration.",
-    });
-  }
-
-  const authorization = Buffer.from(`${publicKey}:${secretKey}`).toString(
-    "base64",
-  );
-
   try {
-    const response = await $fetch(
-      "https://servicepoints.sendcloud.sc/api/v2/service-points",
-      {
-        query: {
-          country: "FR",
-          address: code,
-          radius: 15000,
-          carrier: "mondial_relay",
-        },
-
-        headers: {
-          Authorization: `Basic ${authorization}`,
-        },
-      },
-    );
-
-    const points = (response || []).map((point) => ({
-      id: String(point.id),
-
-      name: point.name || "Point Relais Mondial Relay",
-
-      address: [point.street, point.house_number].filter(Boolean),
-
-      postalCode: point.postal_code || "",
-
-      city: point.city || "",
-
-      distance: point.distance || null,
-
-      label: [
-        point.name,
-        [point.street, point.house_number].filter(Boolean).join(" "),
-        `${point.postal_code || ""} ${point.city || ""}`.trim(),
-      ]
-        .filter(Boolean)
-        .join(", "),
-    }));
-
-    return {
-      points,
-    };
+    return { points: await findMondialRelayPoints(code) };
   } catch (error) {
     console.error("Sendcloud service points error:", error?.data || error);
 
     throw createError({
-      statusCode: 502,
-      statusMessage:
-        "La recherche Mondial Relay est indisponible. Réessayez dans un instant.",
+      statusCode: error.statusCode || 502,
+      statusMessage: error.message || "La recherche Mondial Relay est indisponible. Réessayez dans un instant.",
     });
   }
 });

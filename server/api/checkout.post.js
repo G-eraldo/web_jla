@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto'
 import { products as demoProducts } from '~/data/products'
 import { shippingAmountFor } from '~/lib/shipping'
 import { isValidPickupSelection } from '../utils/delivery.js'
+import { validateMondialRelayPoint } from '../utils/sendcloud-service-points.js'
 
 function strapiHeaders() {
   const token = process.env.STRAPI_API_TOKEN
@@ -26,6 +27,15 @@ export default defineEventHandler(async event => {
   if (!lines.length || requiredCustomerFields.some(field => !String(customer[field] || '').trim())) throw createError({ statusCode: 400, statusMessage: 'Veuillez compléter vos informations de livraison.' })
   if (!['home', 'pickup'].includes(delivery.method) || !isValidPickupSelection(delivery)) throw createError({ statusCode: 400, statusMessage: 'Veuillez sélectionner un point relais Mondial Relay.' })
   if (!body?.acceptedTerms) throw createError({ statusCode: 400, statusMessage: 'Vous devez accepter les conditions générales de vente.' })
+
+  let pickupPoint = null
+  if (delivery.method === 'pickup') {
+    try {
+      pickupPoint = await validateMondialRelayPoint(delivery.pickupPointId)
+    } catch (error) {
+      throw createError({ statusCode: error.statusCode || 502, statusMessage: error.message })
+    }
+  }
 
   let catalog = demoProducts.map(product => ({ ...product, id: String(product.id), stock: 10 }))
   try {
@@ -55,7 +65,7 @@ export default defineEventHandler(async event => {
         firstName: customer.firstName.trim(), lastName: customer.lastName.trim(), email: customer.email.trim().toLowerCase(), phone: customer.phone.trim(),
         addressLine1: customer.addressLine1.trim(), addressLine2: String(customer.addressLine2 || '').trim() || null,
         postalCode: customer.postalCode.trim(), city: customer.city.trim(), country: 'France',
-        deliveryMethod: delivery.method, pickupPoint: delivery.method === 'pickup' ? delivery.pickupPoint.trim() : null, pickupPointId: delivery.method === 'pickup' ? delivery.pickupPointId : null,
+        deliveryMethod: delivery.method, pickupPoint: pickupPoint?.label || null, pickupPointId: pickupPoint?.id || null,
         items: items.map(({ product, quantity }) => ({ productDocumentId: product.id, productName: product.name, unitPrice: product.price, quantity })),
         subtotalAmount, shippingAmount, totalAmount, currency: 'EUR', paymentStatus: 'pending', fulfillmentStatus: 'pending'
       }
