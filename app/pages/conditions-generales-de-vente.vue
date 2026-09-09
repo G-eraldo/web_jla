@@ -20,7 +20,7 @@ useSeoMeta({
       <div class="mt-12 space-y-12">
         <section>
           <h2 class="font-serif text-3xl text-[#302722]">1. Vendeuse et champ d’application</h2>
-          <p class="mt-4">La vendeuse est <strong>Julia Touret, entrepreneur individuel, exerçant sous le nom commercial Maison JLA</strong>, 5 rue Joliot Curie, 80200 Flamicourt, France. SIREN : <strong>109 541 771</strong>. SIRET : <strong>109 541 771 00019</strong>. Immatriculation RCS : <strong>109 541 771</strong>. E-mail : <a class="text-[#9b712d] underline underline-offset-4" href="mailto:maisonjla@outlook.com">maisonjla@outlook.com</a>. Téléphone : <a class="text-[#9b712d] underline underline-offset-4" href="tel:+33677886909">06 77 88 69 09</a>.</p>
+          <p class="mt-4">La vendeuse est <strong>Julia Touret, entrepreneur individuel, exerçant sous le nom commercial Maison JLA</strong>, 5 Rue Joliot-Curie, 80200 Doingt, France. SIREN : <strong>109 541 771</strong>. SIRET : <strong>109 541 771 00019</strong>. Immatriculation RCS : <strong>109 541 771</strong>. E-mail : <a class="text-[#9b712d] underline underline-offset-4" href="mailto:maisonjla@outlook.com">maisonjla@outlook.com</a>. Téléphone : <a class="text-[#9b712d] underline underline-offset-4" href="tel:+33677886909">06 77 88 69 09</a>.</p>
           <p class="mt-4">Les présentes CGV s’appliquent aux ventes de bijoux fantaisie artisanaux, assemblés, fabriqués ou revendus par Maison JLA, conclues avec des acheteurs agissant à des fins non professionnelles.</p>
         </section>
 
@@ -59,7 +59,7 @@ useSeoMeta({
         <section>
           <h2 class="font-serif text-3xl text-[#302722]">7. Droit de rétractation et retours</h2>
           <p class="mt-4">Le client dispose de quatorze jours à compter du lendemain de la réception du produit pour notifier sa décision de se rétracter, sans avoir à la motiver. Il peut utiliser la page <NuxtLink class="font-medium text-[#9b712d] underline underline-offset-4" to="/retractation">Renoncer au contrat ici</NuxtLink>, envoyer le formulaire type figurant à la fin des présentes CGV ou adresser toute déclaration non ambiguë à Maison JLA par e-mail ou par courrier.</p>
-          <p class="mt-4">Après notification, le client renvoie les produits au plus tard dans les quatorze jours à : Maison JLA, Julia Touret EI, 5 rue Joliot Curie, 80200 Flamicourt. Les frais directs de retour sont à sa charge. Le client peut manipuler le produit uniquement dans la mesure nécessaire pour en établir la nature, les caractéristiques et le bon fonctionnement ; sa responsabilité peut être engagée en cas de dépréciation résultant de manipulations excessives.</p>
+          <p class="mt-4">Après notification, le client renvoie les produits au plus tard dans les quatorze jours à : Maison JLA, Julia Touret EI, 5 Rue Joliot-Curie, 80200 Doingt. Les frais directs de retour sont à sa charge. Le client peut manipuler le produit uniquement dans la mesure nécessaire pour en établir la nature, les caractéristiques et le bon fonctionnement ; sa responsabilité peut être engagée en cas de dépréciation résultant de manipulations excessives.</p>
           <p class="mt-4">Maison JLA rembourse tous les paiements reçus, y compris les frais de livraison standard, dans les quatorze jours suivant la notification. Le remboursement peut être différé jusqu’à la récupération des produits ou jusqu’à la fourniture d’une preuve d’expédition, la première de ces dates étant retenue. Il est effectué par le même moyen de paiement, sauf accord exprès contraire et sans frais pour le client.</p>
         </section>
 
@@ -107,7 +107,7 @@ useSeoMeta({
           <h2 class="font-serif text-3xl text-[#302722]">14. Formulaire type de rétractation</h2>
           <p class="mt-4">À compléter et à envoyer uniquement si vous souhaitez vous rétracter :</p>
           <div class="mt-4 space-y-3 border-l-2 border-[#c7a56d] pl-5">
-            <p>À l’attention de Julia Touret EI – Maison JLA, 5 rue Joliot Curie, 80200 Flamicourt, maisonjla@outlook.com.</p>
+            <p>À l’attention de Julia Touret EI – Maison JLA, 5 Rue Joliot-Curie, 80200 Doingt, maisonjla@outlook.com.</p>
             <p>Je vous notifie par la présente ma rétractation du contrat portant sur la vente du ou des biens suivants : …</p>
             <p>Commandé(s) le : … / Reçu(s) le : …</p>
             <p>Numéro de commande : …</p>

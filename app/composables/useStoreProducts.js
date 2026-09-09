@@ -86,7 +86,7 @@ export function useStoreProducts() {
           mainMaterials: "Acier inoxydable.",
           manufacturerBrand: "Maison JLA",
           manufacturerCompany: "Touret Julia",
-          manufacturerPostalAddress: "5 rue Joliot Curie\n80200 Flamicourt\nFrance",
+          manufacturerPostalAddress: "5 Rue Joliot-Curie\n80200 Doingt\nFrance",
           manufacturerEmail: "maisonjla@outlook.com",
           safetyWarnings: "Démonstration locale uniquement.",
         },

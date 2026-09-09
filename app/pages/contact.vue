@@ -46,7 +46,7 @@ async function sendMessage() {
           livraison ? Écrivez-nous, nous vous répondrons avec plaisir.</p>
         <div class="mt-10 border-l border-[#bfa36d] pl-6 text-sm leading-7 text-[#514640]">
           <p class="font-medium text-[#302722]">Maison JLA</p>
-          <p>5 rue Joliot Curie<br>80200 Flamicourt</p>
+          <p>5 Rue Joliot-Curie<br>80200 Doingt</p>
           <a class="mt-3 inline-block text-[#9b712d] underline underline-offset-4"
             href="mailto:maisonjla@outlook.com">maisonjla@outlook.com</a>
           <a class="block text-[#9b712d] underline underline-offset-4" href="tel:+33677886909">06 77 88 69 09</a>
