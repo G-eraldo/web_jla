@@ -27,8 +27,15 @@ export function useStoreProducts() {
   };
 
   const normalizeProduct = (product) => {
-    const source =
-      product.images?.[0]?.url || product.image || demoProducts[0].image;
+    const imageSources = (product.images || [])
+      .map((image) => image?.url)
+      .filter(Boolean);
+    const sources = imageSources.length
+      ? imageSources
+      : [product.image || demoProducts[0].image];
+    const images = sources.map((source) =>
+      source.startsWith("/") ? `${config.public.strapiUrl}${source}` : source,
+    );
     const stock = Number(product.stock);
     const safety = product.productSafety || {};
     const hasSafetyInformation = [
@@ -52,9 +59,8 @@ export function useStoreProducts() {
       categorySlug: String(product.category || "Bijou")
         .trim()
         .toLowerCase(),
-      image: source.startsWith("/")
-        ? `${config.public.strapiUrl}${source}`
-        : source,
+      image: images[0],
+      images,
       safety: hasSafetyInformation
         ? {
             productReference: safety.productReference.trim(),
