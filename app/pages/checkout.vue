@@ -16,7 +16,7 @@ const money = value => new Intl.NumberFormat('fr-FR', { style: 'currency', curre
 const shippingAmount = computed(() => shippingAmountFor(delivery.method, cart.total))
 const freeShippingRemaining = computed(() => amountUntilFreeShipping(cart.total))
 const hasFreeShipping = computed(() => freeShippingRemaining.value === 0)
-const totalAmount = computed(() => cart.total + shippingAmount.value)
+const totalAmount = computed(() => cart.totalAfterDiscount + shippingAmount.value)
 
 useSeoMeta({ title: 'Finaliser ma commande — Maison JLA', description: 'Renseignez vos coordonnées et finalisez votre commande Maison JLA en toute sécurité.' })
 
@@ -24,7 +24,7 @@ async function checkout() {
   loading.value = true
   errorMessage.value = ''
   try {
-    const result = await $fetch('/api/checkout', { method: 'POST', body: { customer: form, delivery, acceptedTerms: acceptedTerms.value, items: cart.items.map(item => ({ id: item.id, quantity: item.quantity })) } })
+    const result = await $fetch('/api/checkout', { method: 'POST', body: { customer: form, delivery, acceptedTerms: acceptedTerms.value, promoCode: cart.promoCode || null, items: cart.items.map(item => ({ id: item.id, quantity: item.quantity })) } })
     await navigateTo(result.checkoutUrl, { external: true })
   } catch (error) {
     errorMessage.value = error.data?.statusMessage || error.message || 'Le paiement est indisponible.'
@@ -130,8 +130,11 @@ onBeforeUnmount(() => clearTimeout(relaySearchTimer))
             item.name }}
               × {{ item.quantity }}</span><span class="shrink-0">{{ money(item.price * item.quantity) }}</span></div>
         </div>
+        <PromoCodeForm class="mb-5" />
         <div class="space-y-2 border-b pb-5 text-sm">
           <div class="flex justify-between"><span>Sous-total</span><span>{{ money(cart.total) }}</span></div>
+          <div v-if="cart.discountAmount" class="flex justify-between text-green-700"><span>Réduction · {{ cart.promoCode
+              }}</span><span>− {{ money(cart.discountAmount) }}</span></div>
           <div class="flex justify-between"><span>Livraison {{ delivery.method === 'pickup' ? 'Mondial Relay' : 'à domicile'
               }}</span><span>{{ hasFreeShipping ? 'Offerte' : money(shippingAmount) }}</span></div>
         </div>
@@ -142,6 +145,7 @@ onBeforeUnmount(() => clearTimeout(relaySearchTimer))
         <p class="mt-3 text-xs leading-5 text-[#776b64]">Livraison prévue sous 3 à 6 jours ouvrés à compter de la confirmation du paiement.</p>
         <label class="mt-5 flex gap-3 text-sm leading-5"><input v-model="acceptedTerms"
             required type="checkbox" class="mt-1"><span>J’accepte les <NuxtLink class="font-medium underline underline-offset-4" to="/conditions-generales-de-vente" target="_blank">conditions générales de vente</NuxtLink> et reconnais avoir lu la <NuxtLink class="font-medium underline underline-offset-4" to="/politique-confidentialite" target="_blank">politique de confidentialité</NuxtLink>.</span></label>
+        <p class="mt-3 text-xs leading-5 text-[#776b64]">Les champs de ce formulaire sont nécessaires pour exécuter la commande, le paiement et la livraison. Maison JLA est responsable du traitement ; Mollie, Resend, Sendcloud et le transporteur reçoivent seulement les données utiles à leur mission. Vos droits s’exercent à maisonjla@outlook.fr. Les détails, durées de conservation et transferts éventuels figurent dans la politique de confidentialité.</p>
         <p v-if="errorMessage" class="mt-5 text-sm text-red-600">{{ errorMessage }}</p><button
           class="mt-6 w-full bg-[#302722] py-4 text-xs uppercase tracking-widest text-white disabled:cursor-not-allowed disabled:opacity-60"
           :disabled="loading">{{ loading ? 'Redirection…' : 'Payer — commande avec obligation de paiement' }}</button>

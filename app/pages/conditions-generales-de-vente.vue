@@ -20,7 +20,7 @@ useSeoMeta({
       <div class="mt-12 space-y-12">
         <section>
           <h2 class="font-serif text-3xl text-[#302722]">1. Vendeuse et champ d’application</h2>
-          <p class="mt-4">La vendeuse est <strong>Julia Touret, entrepreneur individuel, exerçant sous le nom commercial Maison JLA</strong>, 5 rue Joliot Curie, 80200 Flamicourt, France. SIREN : <strong>109 541 771</strong>. SIRET : <strong>109 541 771 00019</strong>. Immatriculation RCS : <strong>109 541 771</strong>. E-mail : <a class="text-[#9b712d] underline underline-offset-4" href="mailto:maisonjla@outlook.com">maisonjla@outlook.com</a>. Téléphone : <a class="text-[#9b712d] underline underline-offset-4" href="tel:+33677886909">06 77 88 69 09</a>.</p>
+          <p class="mt-4">La vendeuse est <strong>Julia Touret, entrepreneur individuel, exerçant sous le nom commercial Maison JLA</strong>, 5 rue Joliot Curie, 80200 Flamicourt, France. SIREN : <strong>109 541 771</strong>. SIRET : <strong>109 541 771 00019</strong>. Immatriculation RCS : <strong>109 541 771</strong>. E-mail : <a class="text-[#9b712d] underline underline-offset-4" href="mailto:maisonjla@outlook.fr">maisonjla@outlook.fr</a>. Téléphone : <a class="text-[#9b712d] underline underline-offset-4" href="tel:+33677886909">06 77 88 69 09</a>.</p>
           <p class="mt-4">Les présentes CGV s’appliquent aux ventes de bijoux fantaisie artisanaux, assemblés, fabriqués ou revendus par Maison JLA, conclues avec des acheteurs agissant à des fins non professionnelles.</p>
         </section>
 
@@ -98,7 +98,7 @@ useSeoMeta({
 
         <section>
           <h2 class="font-serif text-3xl text-[#302722]">13. Réclamations, médiation et litiges</h2>
-          <p class="mt-4">Toute réclamation doit d’abord être adressée à Maison JLA par e-mail à <a class="text-[#9b712d] underline underline-offset-4" href="mailto:maisonjla@outlook.com">maisonjla@outlook.com</a> ou par courrier à l’adresse indiquée à l’article 1.</p>
+          <p class="mt-4">Toute réclamation doit d’abord être adressée à Maison JLA par e-mail à <a class="text-[#9b712d] underline underline-offset-4" href="mailto:maisonjla@outlook.fr">maisonjla@outlook.fr</a> ou par courrier à l’adresse indiquée à l’article 1.</p>
           <p class="mt-4">Après une réclamation écrite préalable restée sans solution, le client peut recourir gratuitement au <strong>Centre de la Médiation de la Consommation de Conciliateurs de Justice CM2C</strong>, 49 rue de Ponthieu, 75008 Paris, par l’intermédiaire du site <a class="text-[#9b712d] underline underline-offset-4" href="https://www.cm2c.net/declarer-un-litige.php" target="_blank" rel="noopener noreferrer">cm2c.net</a>.</p>
           <p class="mt-4">Les présentes CGV et les ventes sont soumises au droit français. À défaut de résolution amiable, le client peut saisir la juridiction compétente selon les règles de droit commun. Il peut notamment saisir la juridiction de son domicile dans les conditions prévues par le Code de la consommation.</p>
         </section>
@@ -107,7 +107,7 @@ useSeoMeta({
           <h2 class="font-serif text-3xl text-[#302722]">14. Formulaire type de rétractation</h2>
           <p class="mt-4">À compléter et à envoyer uniquement si vous souhaitez vous rétracter :</p>
           <div class="mt-4 space-y-3 border-l-2 border-[#c7a56d] pl-5">
-            <p>À l’attention de Julia Touret EI – Maison JLA, 5 rue Joliot Curie, 80200 Flamicourt, maisonjla@outlook.com.</p>
+            <p>À l’attention de Julia Touret EI – Maison JLA, 5 rue Joliot Curie, 80200 Flamicourt, maisonjla@outlook.fr.</p>
             <p>Je vous notifie par la présente ma rétractation du contrat portant sur la vente du ou des biens suivants : …</p>
             <p>Commandé(s) le : … / Reçu(s) le : …</p>
             <p>Numéro de commande : …</p>

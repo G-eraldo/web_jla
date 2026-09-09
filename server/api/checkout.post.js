@@ -1,9 +1,9 @@
 import { createMollieClient } from '@mollie/api-client'
 import { randomUUID } from 'node:crypto'
-import { products as demoProducts } from '~/data/products'
-import { shippingAmountFor } from '~/lib/shipping'
 import { isValidPickupSelection } from '../utils/delivery.js'
 import { validateMondialRelayPoint } from '../utils/sendcloud-service-points.js'
+import { aggregateCartLines } from '../utils/checkout.js'
+import { enforceRateLimit } from '../utils/request-security.js'
 
 function strapiHeaders() {
   const token = process.env.STRAPI_API_TOKEN
@@ -16,17 +16,20 @@ function makeReference() {
 }
 
 export default defineEventHandler(async event => {
+  enforceRateLimit(event, { name: 'checkout', limit: 5, windowMs: 10 * 60 * 1000 })
   const config = useRuntimeConfig()
   if (!config.mollieApiKey) throw createError({ statusCode: 503, statusMessage: 'Le paiement est en cours de configuration.' })
+  if (Number(getHeader(event, 'content-length') || 0) > 20_000) throw createError({ statusCode: 413, statusMessage: 'La demande est trop volumineuse.' })
 
   const body = await readBody(event)
-  const lines = Array.isArray(body?.items) ? body.items : []
+  const lines = aggregateCartLines(body?.items)
   const customer = body?.customer || {}
   const delivery = body?.delivery || {}
   const requiredCustomerFields = ['firstName', 'lastName', 'email', 'phone', 'addressLine1', 'postalCode', 'city']
-  if (!lines.length || requiredCustomerFields.some(field => !String(customer[field] || '').trim())) throw createError({ statusCode: 400, statusMessage: 'Veuillez compléter vos informations de livraison.' })
+  if (!lines.length || requiredCustomerFields.some(field => !String(customer[field] || '').trim() || String(customer[field]).trim().length > 200)) throw createError({ statusCode: 400, statusMessage: 'Veuillez compléter vos informations de livraison.' })
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(customer.email).trim()) || !/^\d{5}$/.test(String(customer.postalCode).trim())) throw createError({ statusCode: 400, statusMessage: 'Vos coordonnées de livraison sont invalides.' })
   if (!['home', 'pickup'].includes(delivery.method) || !isValidPickupSelection(delivery)) throw createError({ statusCode: 400, statusMessage: 'Veuillez sélectionner un point relais Mondial Relay.' })
-  if (!body?.acceptedTerms) throw createError({ statusCode: 400, statusMessage: 'Vous devez accepter les conditions générales de vente.' })
+  if (body?.acceptedTerms !== true) throw createError({ statusCode: 400, statusMessage: 'Vous devez accepter les conditions générales de vente.' })
 
   let pickupPoint = null
   if (delivery.method === 'pickup') {
@@ -37,51 +40,59 @@ export default defineEventHandler(async event => {
     }
   }
 
-  let catalog = demoProducts.map(product => ({ ...product, id: String(product.id), stock: 10 }))
-  try {
-    const response = await $fetch(`${config.public.strapiUrl.replace(/\/$/, '')}/api/products?fields[0]=name&fields[1]=price&fields[2]=stock&pagination[pageSize]=100`)
-    if (response.data?.length) catalog = response.data.map(product => ({ id: String(product.documentId || product.id), name: product.name, price: Number(product.price), stock: Number(product.stock) }))
-  } catch {}
-
-  const items = lines.map(line => {
-    const product = catalog.find(item => item.id === String(line.id))
-    const quantity = Number(line.quantity)
-    if (!product || !Number.isFinite(product.price) || !Number.isInteger(quantity) || quantity < 1 || quantity > 10) throw createError({ statusCode: 400, statusMessage: 'Votre panier contient un article invalide.' })
-    if (!Number.isInteger(product.stock) || product.stock < quantity) throw createError({ statusCode: 409, statusMessage: `Le stock de « ${product.name} » vient d’être mis à jour. Veuillez actualiser votre panier.` })
-    return { product, quantity }
-  })
-  const subtotalAmount = items.reduce((sum, line) => sum + line.product.price * line.quantity, 0)
-  const shippingAmount = shippingAmountFor(delivery.method, subtotalAmount)
-  const totalAmount = subtotalAmount + shippingAmount
   const strapiUrl = config.public.strapiUrl.replace(/\/$/, '')
-  const reference = makeReference()
-
-  const created = await $fetch(`${strapiUrl}/api/orders`, {
-    method: 'POST',
-    headers: strapiHeaders(),
-    body: {
-      data: {
-        reference,
-        firstName: customer.firstName.trim(), lastName: customer.lastName.trim(), email: customer.email.trim().toLowerCase(), phone: customer.phone.trim(),
-        addressLine1: customer.addressLine1.trim(), addressLine2: String(customer.addressLine2 || '').trim() || null,
-        postalCode: customer.postalCode.trim(), city: customer.city.trim(), country: 'France',
-        deliveryMethod: delivery.method, pickupPoint: pickupPoint?.label || null, pickupPointId: pickupPoint?.id || null,
-        items: items.map(({ product, quantity }) => ({ productDocumentId: product.id, productName: product.name, unitPrice: product.price, quantity })),
-        subtotalAmount, shippingAmount, totalAmount, currency: 'EUR', paymentStatus: 'pending', fulfillmentStatus: 'pending'
-      }
-    }
-  })
-  const order = created.data
-  const siteUrl = config.public.siteUrl.replace(/\/$/, '')
-  const paymentData = {
-    amount: { currency: 'EUR', value: totalAmount.toFixed(2) },
-    description: `Maison JLA · ${reference}`,
-    redirectUrl: `${siteUrl}/commande/merci?reference=${encodeURIComponent(reference)}`,
-    metadata: { orderDocumentId: order.documentId }
+  try {
+    const response = await $fetch(`${strapiUrl}/api/products?fields[0]=documentId&pagination[pageSize]=1`)
+    if (!response.data?.length) throw new Error('catalogue vide')
+  } catch {
+    throw createError({ statusCode: 503, statusMessage: 'Le catalogue est temporairement indisponible. Veuillez réessayer.' })
   }
-  if (!siteUrl.includes('localhost') && !siteUrl.includes('127.0.0.1')) paymentData.webhookUrl = `${siteUrl}/api/mollie/webhook`
 
-  const payment = await createMollieClient({ apiKey: config.mollieApiKey }).payments.create(paymentData)
-  await $fetch(`${strapiUrl}/api/orders/${order.documentId}`, { method: 'PUT', headers: strapiHeaders(), body: { data: { molliePaymentId: payment.id } } })
+  if (lines.some(line => line.quantity > 10)) throw createError({ statusCode: 400, statusMessage: 'La quantité maximale par bijou est de 10 exemplaires.' })
+  const reference = makeReference()
+  let order
+  try {
+    const created = await $fetch(`${strapiUrl}/api/orders/reserve`, {
+      method: 'POST',
+      headers: strapiHeaders(),
+      body: {
+        data: {
+          reference,
+          customer,
+          delivery: {
+            method: delivery.method,
+            pickupPoint: pickupPoint?.label || null,
+            pickupPointId: pickupPoint?.id || null
+          },
+          promoCode: String(body?.promoCode || '').trim().toUpperCase().slice(0, 40) || null,
+          items: lines.map(line => ({ productDocumentId: line.id, quantity: line.quantity }))
+        }
+      }
+    })
+    order = created.data
+  } catch (error) {
+    throw createError({ statusCode: error?.statusCode || 503, statusMessage: error?.data?.error?.message || 'La réservation du stock est temporairement indisponible.' })
+  }
+
+  const siteUrl = config.public.siteUrl.replace(/\/$/, '')
+  let payment
+  try {
+    payment = await createMollieClient({ apiKey: config.mollieApiKey }).payments.create({
+      amount: { currency: 'EUR', value: Number(order.totalAmount).toFixed(2) },
+      description: `Maison JLA · ${reference}`,
+      redirectUrl: `${siteUrl}/commande/merci?reference=${encodeURIComponent(reference)}`,
+      metadata: { orderDocumentId: order.documentId },
+      ...(!siteUrl.includes('localhost') && !siteUrl.includes('127.0.0.1') ? { webhookUrl: `${siteUrl}/api/mollie/webhook` } : {})
+    })
+    await $fetch(`${strapiUrl}/api/orders/${encodeURIComponent(order.documentId)}/attach-payment`, {
+      method: 'POST', headers: strapiHeaders(), body: { data: { molliePaymentId: payment.id } }
+    })
+  } catch (error) {
+    try {
+      await $fetch(`${strapiUrl}/api/orders/${encodeURIComponent(order.documentId)}/release-reservation`, { method: 'POST', headers: strapiHeaders() })
+    } catch {}
+    throw createError({ statusCode: 502, statusMessage: 'Le paiement est temporairement indisponible. Aucun montant n’a été débité.' })
+  }
+
   return { checkoutUrl: payment.getCheckoutUrl() }
 })

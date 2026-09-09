@@ -30,6 +30,16 @@ export function useStoreProducts() {
     const source =
       product.images?.[0]?.url || product.image || demoProducts[0].image;
     const stock = Number(product.stock);
+    const safety = product.productSafety || {};
+    const hasSafetyInformation = [
+      safety.productReference,
+      safety.mainMaterials,
+      safety.manufacturerBrand,
+      safety.manufacturerCompany,
+      safety.manufacturerPostalAddress,
+      safety.manufacturerEmail,
+      safety.safetyWarnings,
+    ].every((field) => typeof field === "string" && field.trim());
 
     return {
       id: product.documentId || product.id,
@@ -45,26 +55,68 @@ export function useStoreProducts() {
       image: source.startsWith("/")
         ? `${config.public.strapiUrl}${source}`
         : source,
+      safety: hasSafetyInformation
+        ? {
+            productReference: safety.productReference.trim(),
+            batchNumber: String(safety.batchNumber || "").trim(),
+            mainMaterials: safety.mainMaterials.trim(),
+            manufacturerBrand: safety.manufacturerBrand.trim(),
+            manufacturerCompany: safety.manufacturerCompany.trim(),
+            manufacturerPostalAddress: safety.manufacturerPostalAddress.trim(),
+            manufacturerEmail: safety.manufacturerEmail.trim(),
+            safetyWarnings: safety.safetyWarnings.trim(),
+          }
+        : null,
     };
   };
 
   const demoCatalog = () =>
-    demoProducts.map((product) => normalizeProduct({ ...product, stock: 10 }));
+    demoProducts.map((product, index) =>
+      normalizeProduct({
+        ...product,
+        stock: 10,
+        productSafety: {
+          productReference: `DEMO-${index + 1}`,
+          mainMaterials: "Acier inoxydable.",
+          manufacturerBrand: "Maison JLA",
+          manufacturerCompany: "Touret Julia",
+          manufacturerPostalAddress: "5 rue Joliot Curie\n80200 Flamicourt\nFrance",
+          manufacturerEmail: "maisonjla@outlook.fr",
+          safetyWarnings: "Démonstration locale uniquement.",
+        },
+      }),
+    );
 
   const listProducts = async () => {
     try {
       const { find } = useStrapi();
       const response = await find("products", {
         fields: ["name", "slug", "price", "stock", "category", "description"],
-        populate: ["images"],
+        populate: {
+          images: { fields: ["url"] },
+          productSafety: {
+            fields: [
+              "productReference",
+              "batchNumber",
+              "mainMaterials",
+              "manufacturerBrand",
+              "manufacturerCompany",
+              "manufacturerPostalAddress",
+              "manufacturerEmail",
+              "safetyWarnings",
+            ],
+          },
+        },
         pagination: { pageSize: 100 },
       });
 
       return response.data?.length
-        ? response.data.map(normalizeProduct)
-        : demoCatalog();
+        ? response.data.map(normalizeProduct).filter((product) => product.safety)
+        : import.meta.dev
+          ? demoCatalog()
+          : [];
     } catch {
-      return demoCatalog();
+      return import.meta.dev ? demoCatalog() : [];
     }
   };
 

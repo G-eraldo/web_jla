@@ -1,11 +1,14 @@
-import { randomUUID } from 'node:crypto'
 import { Resend } from 'resend'
+import { persistWithdrawal, recordWithdrawalEmails } from '../utils/withdrawal.js'
+import { enforceRateLimit, enforceRequestSize } from '../utils/request-security.js'
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const clean = (value, maxLength) => String(value || '').trim().slice(0, maxLength)
 const escapeHtml = value => clean(value, 2000).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[character])
 
 export default defineEventHandler(async event => {
+  enforceRateLimit(event, { name: 'retractation', limit: 3, windowMs: 60 * 60 * 1000 })
+  enforceRequestSize(event, 16 * 1024)
   const body = await readBody(event)
   if (body?.website) return { reference: 'Demande reçue', sentAt: new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/Paris' }).format(new Date()) }
 
@@ -24,24 +27,50 @@ export default defineEventHandler(async event => {
 
   const apiKey = process.env.RESEND_API_KEY
   const from = process.env.RESEND_FROM
-  const sellerEmail = process.env.RETRACTATION_TO || 'maisonjla@outlook.com'
-  if (!apiKey || !from) throw createError({ statusCode: 503, statusMessage: 'L’envoi est temporairement indisponible. Écrivez à maisonjla@outlook.com.' })
+  const sellerEmail = process.env.RETRACTATION_TO || 'maisonjla@outlook.fr'
+  if (!apiKey || !from) throw createError({ statusCode: 503, statusMessage: 'L’envoi est temporairement indisponible. Écrivez à maisonjla@outlook.fr.' })
 
   const sentAtDate = new Date()
   const sentAt = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeStyle: 'long', timeZone: 'Europe/Paris' }).format(sentAtDate)
-  const reference = `RET-${sentAtDate.toISOString().slice(0, 10).replaceAll('-', '')}-${randomUUID().slice(0, 8).toUpperCase()}`
+  const config = useRuntimeConfig()
+  const saved = await persistWithdrawal({
+    strapiUrl: config.public.strapiUrl,
+    token: process.env.STRAPI_API_TOKEN,
+    declaration,
+    declaredAt: sentAtDate
+  })
+  const reference = saved.reference
   const plainDeclaration = `Nom : ${declaration.firstName} ${declaration.lastName}\nE-mail : ${declaration.email}\nCommande : ${declaration.orderReference}\nProduits : ${declaration.products}\nDate de commande : ${declaration.orderedAt}\nDate de réception : ${declaration.receivedAt || 'non renseignée'}\nDéclaration envoyée le : ${sentAt}\nRéférence : ${reference}`
   const htmlDeclaration = `<dl><dt><strong>Nom</strong></dt><dd>${escapeHtml(declaration.firstName)} ${escapeHtml(declaration.lastName)}</dd><dt><strong>E-mail</strong></dt><dd>${escapeHtml(declaration.email)}</dd><dt><strong>Commande</strong></dt><dd>${escapeHtml(declaration.orderReference)}</dd><dt><strong>Produits</strong></dt><dd>${escapeHtml(declaration.products).replaceAll('\n', '<br>')}</dd><dt><strong>Date de commande</strong></dt><dd>${escapeHtml(declaration.orderedAt)}</dd><dt><strong>Date de réception</strong></dt><dd>${escapeHtml(declaration.receivedAt || 'non renseignée')}</dd><dt><strong>Envoi</strong></dt><dd>${escapeHtml(sentAt)}</dd><dt><strong>Référence</strong></dt><dd>${reference}</dd></dl>`
   const resend = new Resend(apiKey)
 
+  let sellerSent = false
+  let customerSent = false
   try {
-    await Promise.all([
-      resend.emails.send({ from, to: sellerEmail, replyTo: declaration.email, subject: `Rétractation ${declaration.orderReference} — ${reference}`, text: `Une déclaration de rétractation a été reçue.\n\n${plainDeclaration}`, html: `<h1>Déclaration de rétractation reçue</h1>${htmlDeclaration}` }),
-      resend.emails.send({ from, to: declaration.email, replyTo: sellerEmail, subject: `Accusé de réception de votre rétractation — Maison JLA`, text: `Votre déclaration de rétractation a été transmise à Maison JLA.\n\n${plainDeclaration}\n\nConservez cet e-mail. Maison JLA vous indiquera les modalités de retour.`, html: `<h1>Votre rétractation a bien été transmise</h1><p>Conservez cet accusé de réception sur support durable.</p>${htmlDeclaration}<p>Maison JLA vous indiquera les modalités de retour.</p>` })
-    ])
+    if (!saved.duplicate) {
+      await resend.emails.send({ from, to: sellerEmail, replyTo: declaration.email, subject: `Rétractation ${declaration.orderReference} — ${reference}`, text: `Une déclaration de rétractation a été reçue.\n\n${plainDeclaration}`, html: `<h1>Déclaration de rétractation reçue</h1>${htmlDeclaration}` })
+      sellerSent = true
+    }
   } catch {
-    throw createError({ statusCode: 502, statusMessage: 'L’accusé de réception n’a pas pu être envoyé. Écrivez à maisonjla@outlook.com.' })
+    // Continue with the customer receipt even if the internal alert failed.
+  }
+  try {
+    await resend.emails.send({ from, to: declaration.email, replyTo: sellerEmail, subject: `Accusé de réception de votre rétractation — Maison JLA`, text: `Votre déclaration de rétractation a été transmise à Maison JLA.\n\n${plainDeclaration}\n\nConservez cet e-mail. Maison JLA vous indiquera les modalités de retour.`, html: `<h1>Votre rétractation a bien été transmise</h1><p>Conservez cet accusé de réception sur support durable.</p>${htmlDeclaration}<p>Maison JLA vous indiquera les modalités de retour.</p>` })
+    customerSent = true
+  } catch {
+    // The legally operative declaration was already recorded. We still return
+    // its reference so the customer can prove the notification date.
+  } finally {
+    try {
+      await recordWithdrawalEmails({ strapiUrl: config.public.strapiUrl, token: process.env.STRAPI_API_TOKEN, documentId: saved.documentId, sellerSent, customerSent })
+    } catch {
+      // The declaration remains stored; an administrator can safely resend it.
+    }
   }
 
-  return { reference, sentAt }
+  if (!customerSent) {
+    return { reference, sentAt, receiptPending: true }
+  }
+
+  return { reference, sentAt, receiptPending: false }
 })

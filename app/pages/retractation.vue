@@ -33,7 +33,7 @@ async function confirmWithdrawal() {
   try {
     receipt.value = await $fetch('/api/retractation', { method: 'POST', body: form })
   } catch (error) {
-    errorMessage.value = error.data?.statusMessage || 'La demande n’a pas pu être envoyée. Vous pouvez écrire à maisonjla@outlook.com.'
+    errorMessage.value = error.data?.statusMessage || 'La demande n’a pas pu être envoyée. Vous pouvez écrire à maisonjla@outlook.fr.'
   } finally {
     loading.value = false
   }
@@ -49,7 +49,7 @@ async function confirmWithdrawal() {
 
       <div v-if="receipt" class="mt-10 border border-[#bfa36d] bg-white p-6 text-sm leading-7 text-[#514640] sm:p-8" role="status">
         <h2 class="font-serif text-3xl text-[#302722]">Rétractation enregistrée</h2>
-        <p class="mt-4">Votre déclaration a été envoyée le <strong>{{ receipt.sentAt }}</strong>. Un accusé de réception a été adressé à <strong>{{ form.email }}</strong>.</p>
+        <p class="mt-4">Votre déclaration a été enregistrée le <strong>{{ receipt.sentAt }}</strong>. <template v-if="receipt.receiptPending">L’accusé de réception est en attente : conservez cette page et écrivez à maisonjla@outlook.fr si vous ne recevez rien.</template><template v-else>Un accusé de réception a été adressé à <strong>{{ form.email }}</strong>.</template></p>
         <p class="mt-3">Référence de demande : <strong>{{ receipt.reference }}</strong></p>
         <p class="mt-3">Vous devez renvoyer les produits au plus tard dans les quatorze jours suivant cette notification, selon les modalités des <NuxtLink class="underline underline-offset-4" to="/conditions-generales-de-vente">conditions générales de vente</NuxtLink>.</p>
       </div>

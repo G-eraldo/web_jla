@@ -1,9 +1,13 @@
 import { createMollieClient } from '@mollie/api-client'
 import { findOrderByReference, orderDocumentId, synchronizeOrderPayment } from '../../utils/mollie-order.js'
+import { requestAutomaticRefund } from '../../utils/mollie-refund.js'
+import { enforceRateLimit } from '../../utils/request-security.js'
 
 const referencePattern = /^JLA-\d{8}-[A-F0-9]{8}$/
 
 export default defineEventHandler(async event => {
+  enforceRateLimit(event, { name: 'mollie-status', limit: 20, windowMs: 60 * 1000 })
+  setHeader(event, 'Cache-Control', 'no-store')
   const config = useRuntimeConfig()
   if (!config.mollieApiKey) throw createError({ statusCode: 503, statusMessage: 'Le paiement est en cours de configuration.' })
 
@@ -14,9 +18,11 @@ export default defineEventHandler(async event => {
   const order = await findOrderByReference(strapiUrl, reference)
   if (!order?.molliePaymentId) return { status: 'pending' }
 
-  const payment = await createMollieClient({ apiKey: config.mollieApiKey }).payments.get(order.molliePaymentId)
+  const client = createMollieClient({ apiKey: config.mollieApiKey })
+  const payment = await client.payments.get(order.molliePaymentId)
   if (orderDocumentId(payment.metadata) !== order.documentId) throw createError({ statusCode: 409, statusMessage: 'Le paiement ne correspond pas à cette commande.' })
 
-  const status = await synchronizeOrderPayment(strapiUrl, order, payment)
-  return { status: status || 'pending' }
+  const result = await synchronizeOrderPayment(strapiUrl, order, payment)
+  if (result.refundRequired) await requestAutomaticRefund(client, strapiUrl, order, payment)
+  return { status: result.status || 'pending' }
 })

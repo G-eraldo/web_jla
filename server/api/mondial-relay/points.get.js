@@ -1,6 +1,8 @@
 import { findMondialRelayPoints } from '../../utils/sendcloud-service-points.js'
+import { enforceRateLimit } from '../../utils/request-security.js'
 
 export default defineEventHandler(async (event) => {
+  enforceRateLimit(event, { name: 'mondial-relay-points', limit: 30, windowMs: 60 * 1000 })
   const { postalCode } = getQuery(event);
 
   const code = String(postalCode || "").trim();

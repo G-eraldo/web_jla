@@ -59,6 +59,7 @@ import { LockKeyhole, Package, Truck } from 'lucide-vue-next';
         <NuxtLink to="/livraison" class="block py-2 text-sm hover:underline underline-offset-4">Livraison & questions
           fréquentes</NuxtLink>
         <NuxtLink to="/la-maison" class="block py-2 text-sm hover:underline underline-offset-4">La Maison</NuxtLink>
+        <NuxtLink to="/contact" class="block py-2 text-sm hover:underline underline-offset-4">Contact</NuxtLink>
         <NuxtLink to="/mentions-legales" class="block py-2 text-sm hover:underline underline-offset-4">Mentions légales
         </NuxtLink>
         <NuxtLink to="/conditions-generales-de-vente" class="block py-2 text-sm hover:underline underline-offset-4">Conditions générales de vente

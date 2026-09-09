@@ -113,8 +113,15 @@ watch(() => route.fullPath, () => {
           </div>
         </div>
         <div v-if="cart.items.length" class="border-t border-[#e9ddd3] pt-5">
+          <PromoCodeForm class="mb-5" />
           <div class="flex items-center justify-between text-base"><span>Sous-total</span><span>{{ money(cart.total)
               }}</span></div>
+          <div v-if="cart.discountAmount" class="mt-2 flex items-center justify-between text-sm text-green-700">
+            <span>Réduction · {{ cart.promoCode }}</span><span>− {{ money(cart.discountAmount) }}</span>
+          </div>
+          <div v-if="cart.discountAmount" class="mt-2 flex items-center justify-between font-medium">
+            <span>Après remise</span><span>{{ money(cart.totalAfterDiscount) }}</span>
+          </div>
           <p aria-live="polite" class="mt-2 text-xs leading-5 text-[#776b64]">
             <template v-if="freeShippingRemaining">Encore {{ money(freeShippingRemaining) }} pour profiter de la
               livraison offerte.</template>

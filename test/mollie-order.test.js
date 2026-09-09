@@ -28,15 +28,16 @@ test('synchronise une commande payée et renseigne paidAt', async () => {
   globalThis.$fetch = async (url, options) => calls.push({ url, options })
 
   try {
-    const status = await synchronizeOrderPayment(
+    const result = await synchronizeOrderPayment(
       'https://cms.example.test',
       { documentId: 'order-1', molliePaymentId: 'tr_1', paymentStatus: 'pending', confirmationEmailSentAt: null },
       { id: 'tr_1', status: 'paid', paidAt: '2026-09-08T12:03:00Z' }
     )
 
-    assert.equal(status, 'paid')
+    assert.deepEqual(result, { status: 'paid', refundRequired: false })
     assert.equal(calls.length, 1)
-    assert.deepEqual(calls[0].options.body, { data: { paymentStatus: 'paid', paidAt: '2026-09-08T12:03:00Z' } })
+    assert.equal(calls[0].url, 'https://cms.example.test/api/orders/order-1/confirm-paid-reservation')
+    assert.deepEqual(calls[0].options.body, { data: { paidAt: '2026-09-08T12:03:00Z' } })
   } finally {
     globalThis.$fetch = previousFetch
     if (previousToken === undefined) delete process.env.STRAPI_API_TOKEN
@@ -44,18 +45,22 @@ test('synchronise une commande payée et renseigne paidAt', async () => {
   }
 })
 
-test('ne réécrit pas une commande déjà traitée', async () => {
+test('demande une confirmation idempotente pour un paiement déjà traité', async () => {
+  const previousToken = process.env.STRAPI_API_TOKEN
   const previousFetch = globalThis.$fetch
-  globalThis.$fetch = async () => assert.fail('aucun appel Strapi attendu')
+  process.env.STRAPI_API_TOKEN = 'test-token'
+  globalThis.$fetch = async () => ({ data: { refundRequired: false } })
 
   try {
-    const status = await synchronizeOrderPayment(
+    const result = await synchronizeOrderPayment(
       'https://cms.example.test',
       { documentId: 'order-1', molliePaymentId: 'tr_1', paymentStatus: 'paid', confirmationEmailSentAt: '2026-09-08T12:04:00Z' },
       { id: 'tr_1', status: 'paid', paidAt: '2026-09-08T12:03:00Z' }
     )
-    assert.equal(status, 'paid')
+    assert.deepEqual(result, { status: 'paid', refundRequired: false })
   } finally {
     globalThis.$fetch = previousFetch
+    if (previousToken === undefined) delete process.env.STRAPI_API_TOKEN
+    else process.env.STRAPI_API_TOKEN = previousToken
   }
 })

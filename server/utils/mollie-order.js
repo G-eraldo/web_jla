@@ -26,7 +26,7 @@ export function strapiHeaders() {
 }
 
 export async function findOrderByDocumentId(strapiUrl, documentId) {
-  const response = await $fetch(`${strapiUrl}/api/orders/${encodeURIComponent(documentId)}?fields[0]=molliePaymentId&fields[1]=paymentStatus&fields[2]=confirmationEmailSentAt`, {
+  const response = await $fetch(`${strapiUrl}/api/orders/${encodeURIComponent(documentId)}?fields[0]=molliePaymentId&fields[1]=paymentStatus&fields[2]=confirmationEmailSentAt&fields[3]=refundStatus`, {
     headers: strapiHeaders()
   })
   return response.data
@@ -40,6 +40,7 @@ export async function findOrderByPaymentId(strapiUrl, paymentId) {
       'fields[0]': 'molliePaymentId',
       'fields[1]': 'paymentStatus',
       'fields[2]': 'confirmationEmailSentAt',
+      'fields[3]': 'refundStatus',
       'pagination[pageSize]': 1
     }
   })
@@ -54,6 +55,7 @@ export async function findOrderByReference(strapiUrl, reference) {
       'fields[0]': 'molliePaymentId',
       'fields[1]': 'paymentStatus',
       'fields[2]': 'confirmationEmailSentAt',
+      'fields[3]': 'refundStatus',
       'pagination[pageSize]': 1
     }
   })
@@ -61,13 +63,20 @@ export async function findOrderByReference(strapiUrl, reference) {
 }
 
 export async function synchronizeOrderPayment(strapiUrl, order, payment) {
-  if (!order || order.molliePaymentId !== payment.id) return null
+  if (!order || order.molliePaymentId !== payment.id) return { status: null, refundRequired: false }
 
   const status = mollieStatus(payment.status)
-  const needsConfirmationRetry = status === 'paid' && !order.confirmationEmailSentAt
-  if (order.paymentStatus !== status || needsConfirmationRetry) {
+  if (status === 'paid') {
+    const response = await $fetch(`${strapiUrl}/api/orders/${encodeURIComponent(order.documentId)}/confirm-paid-reservation`, {
+      method: 'POST',
+      headers: strapiHeaders(),
+      body: { data: { paidAt: payment.paidAt || new Date().toISOString() } }
+    })
+    return { status, refundRequired: Boolean(response?.data?.refundRequired) }
+  }
+
+  if (order.paymentStatus !== status) {
     const data = { paymentStatus: status }
-    if (status === 'paid') data.paidAt = payment.paidAt || new Date().toISOString()
     await $fetch(`${strapiUrl}/api/orders/${encodeURIComponent(order.documentId)}`, {
       method: 'PUT',
       headers: strapiHeaders(),
@@ -75,5 +84,5 @@ export async function synchronizeOrderPayment(strapiUrl, order, payment) {
     })
   }
 
-  return status
+  return { status, refundRequired: false }
 }

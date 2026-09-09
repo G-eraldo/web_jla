@@ -56,6 +56,15 @@ useSeoMeta({
           <p class="mt-5 text-xl text-[#514137] sm:text-2xl">{{ money(product.price) }}</p>
           <div class="my-7 h-px bg-[#e9ddd3]" />
           <p class="whitespace-pre-line text-sm leading-7 text-[#776b64]">{{ product.description }}</p>
+          <section v-if="product.safety" aria-labelledby="safety-title" class="mt-7 border-y border-[#e9ddd3] py-5 text-sm leading-6 text-[#514137]">
+            <h2 id="safety-title" class="font-serif text-2xl text-[#302722]">Sécurité et traçabilité</h2>
+            <dl class="mt-4 space-y-3 text-xs leading-6 text-[#776b64]">
+              <div><dt class="font-medium text-[#302722]">Référence</dt><dd>{{ product.safety.productReference }}<template v-if="product.safety.batchNumber"> · Lot {{ product.safety.batchNumber }}</template></dd></div>
+              <div><dt class="font-medium text-[#302722]">Composition</dt><dd>{{ product.safety.mainMaterials }}</dd></div>
+              <div><dt class="font-medium text-[#302722]">Fabricant</dt><dd>{{ product.safety.manufacturerBrand }} — {{ product.safety.manufacturerCompany }}<br><span class="whitespace-pre-line">{{ product.safety.manufacturerPostalAddress }}</span><br><a :href="`mailto:${product.safety.manufacturerEmail}`" class="underline underline-offset-4">{{ product.safety.manufacturerEmail }}</a></dd></div>
+              <div><dt class="font-medium text-[#302722]">Avertissements</dt><dd class="whitespace-pre-line">{{ product.safety.safetyWarnings }}</dd></div>
+            </dl>
+          </section>
           <p v-if="product.stock < 1" class="mt-7 text-sm text-[#986c35]">Ce bijou est actuellement épuisé.</p>
           <p v-else class="mt-7 flex items-center gap-2 text-xs text-[#646b51]"><span class="h-1.5 w-1.5 rounded-full bg-[#78805e]" />Disponible</p>
           <ClientOnly>
