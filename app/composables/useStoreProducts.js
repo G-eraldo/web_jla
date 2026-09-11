@@ -102,7 +102,7 @@ export function useStoreProducts() {
           productReference: `DEMO-${index + 1}`,
           mainMaterials: "Acier inoxydable.",
           manufacturerBrand: "Maison JLA",
-          manufacturerCompany: "Touret Julia",
+          manufacturerCompany: "Julia Touret",
           manufacturerPostalAddress: "5 Rue Joliot-Curie\n80200 Doingt\nFrance",
           manufacturerEmail: "contact@maisonjla.fr",
           safetyWarnings: "Démonstration locale uniquement.",
@@ -134,7 +134,9 @@ export function useStoreProducts() {
       });
 
       return response.data?.length
-        ? response.data.map(normalizeProduct).filter((product) => product.safety)
+        ? response.data
+            .map(normalizeProduct)
+            .filter((product) => product.safety)
         : import.meta.dev
           ? demoCatalog()
           : [];

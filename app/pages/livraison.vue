@@ -26,9 +26,10 @@ useSeoMeta({ title: 'Livraison & paiement — Maison JLA', description: 'Livrais
     <div class="divide-y divide-[#e9ddd3]">
       <section class="py-7">
         <h2 class="font-serif text-2xl">Comment se passe le paiement ?</h2>
-        <p class="mt-3 text-sm leading-7 text-[#776b64]">Le paiement est traité par Mollie sur sa page sécurisée. Les
-          moyens de paiement disponibles y sont présentés. Une fois le paiement confirmé, vous recevez un e-mail
-          récapitulatif.</p>
+        <p class="mt-3 text-sm leading-7 text-[#776b64]">Le paiement s’effectue par carte bancaire, via la page
+          sécurisée de Mollie. D’autres moyens peuvent être proposés par Mollie selon votre banque. Maison JLA ne
+          collecte pas vos données de carte. Une fois le paiement confirmé, vous recevez un e-mail récapitulatif, votre
+          facture et les CGV applicables.</p>
       </section>
       <section class="py-7">
         <h2 class="font-serif text-2xl">Où retrouver ma commande ?</h2>

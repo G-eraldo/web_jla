@@ -1,6 +1,25 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;0,700&display=swap');
-@tailwind base; @tailwind components; @tailwind utilities;
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/dm-sans-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Playfair Display";
+  font-style: normal;
+  font-weight: 500 700;
+  font-display: swap;
+  src: url("/fonts/playfair-display-latin.woff2") format("woff2");
+}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 @layer base {
-  body { @apply bg-[#fffaf6] font-sans text-[#2f2925] antialiased; }
-  :focus-visible { @apply outline outline-2 outline-offset-4 outline-[#916b56]; }
+  body {
+    @apply bg-[#fffaf6] font-sans text-[#2f2925] antialiased;
+  }
+  :focus-visible {
+    @apply outline outline-2 outline-offset-4 outline-[#916b56];
+  }
 }

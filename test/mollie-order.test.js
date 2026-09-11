@@ -20,7 +20,7 @@ test('releases the reservation when Mollie reports a canceled payment', async ()
 
   assert.deepEqual(result, { status: 'canceled', refundRequired: false })
   assert.deepEqual(requests.map(request => request.url), [
-    'https://back.example.test/api/orders/order-1',
+    'https://back.example.test/api/orders/order-1/record-payment-outcome',
     'https://back.example.test/api/orders/order-1/release-reservation'
   ])
   assert.deepEqual(requests[0].options.body, { data: { paymentStatus: 'canceled' } })

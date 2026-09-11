@@ -2,15 +2,21 @@ import { createMollieClient } from "@mollie/api-client";
 import { ORDER_REFERENCE_PATTERN } from "../../utils/checkout.js";
 import {
   findOrderByReference,
-  mollieStatus,
   orderDocumentId,
+  synchronizeOrderPayment,
 } from "../../utils/mollie-order.js";
-import { enforceRateLimit } from "../../utils/request-security.js";
+import { requestAutomaticRefund } from "../../utils/mollie-refund.js";
+import {
+  enforceRateLimit,
+  enforceSameOrigin,
+  readLimitedJsonBody,
+} from "../../utils/request-security.js";
 
 export default defineEventHandler(async (event) => {
+  enforceSameOrigin(event);
   enforceRateLimit(event, {
-    name: "mollie-status",
-    limit: 20,
+    name: "mollie-sync",
+    limit: 12,
     windowMs: 60 * 1000,
   });
   setHeader(event, "Cache-Control", "no-store");
@@ -21,7 +27,8 @@ export default defineEventHandler(async (event) => {
       message: "Le paiement est en cours de configuration.",
     });
 
-  const reference = String(getQuery(event).reference || "")
+  const body = await readLimitedJsonBody(event, 2_000);
+  const reference = String(body.reference || "")
     .trim()
     .toUpperCase();
   if (!ORDER_REFERENCE_PATTERN.test(reference))
@@ -42,7 +49,8 @@ export default defineEventHandler(async (event) => {
       message: "Le paiement ne correspond pas à cette commande.",
     });
 
-  return {
-    status: mollieStatus(payment.status) || order.paymentStatus || "pending",
-  };
+  const result = await synchronizeOrderPayment(strapiUrl, order, payment);
+  if (result.refundRequired)
+    await requestAutomaticRefund(client, strapiUrl, order, payment);
+  return { status: result.status || "pending" };
 });

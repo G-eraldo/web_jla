@@ -5,8 +5,7 @@ export const products = [
     name: "Collier Étoile",
     price: 34,
     category: "Colliers",
-    image:
-      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=90",
+    image: "/logo-maison-jla.png",
     description: "Une étoile délicate, à porter comme un talisman.",
   },
   {
@@ -15,8 +14,7 @@ export const products = [
     name: "Boucles Soleil",
     price: 29,
     category: "Boucles",
-    image:
-      "https://images.unsplash.com/photo-1635767798638-3e25273a8236?auto=format&fit=crop&w=1000&q=90",
+    image: "/logo-maison-jla.png",
     description: "Des rayons dorés pour illuminer vos journées.",
   },
   {
@@ -25,8 +23,7 @@ export const products = [
     name: "Bracelet Coquillages",
     price: 32,
     category: "Bracelets",
-    image:
-      "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1000&q=90",
+    image: "/logo-maison-jla.png",
     description: "L’esprit des vacances autour de votre poignet.",
   },
 ];

@@ -72,7 +72,14 @@ useSeoMeta({
           </div>
           <h1 class="mt-5 font-serif text-4xl leading-[1.04] tracking-[-.02em] text-[#302722] sm:text-5xl xl:text-[3.5rem]">{{ product.name }}</h1>
           <p class="mt-4 text-lg text-[#514137]">{{ money(product.price) }}</p>
+          <p class="mt-3 text-xs leading-6 text-[#776b64]">Garantie légale de conformité de deux ans et garantie des vices cachés. Aucune garantie commerciale n’est proposée. Vous disposez de 14 jours à compter du lendemain de la réception pour vous rétracter, sans motif ; les frais de retour sont à votre charge. <NuxtLink class="underline underline-offset-4" to="/retractation">Renoncer au contrat ici</NuxtLink>.</p>
           <p class="mt-7 whitespace-pre-line text-sm leading-7 text-[#776b64]">{{ product.description }}</p>
+          <aside v-if="product.safety" class="mt-6 border border-[#e9ddd3] bg-[#fffaf6] p-4 text-xs leading-6 text-[#776b64]">
+            <p class="font-medium uppercase tracking-[.14em] text-[#302722]">Sécurité et fabricant</p>
+            <p class="mt-2 whitespace-pre-line">{{ product.safety.safetyWarnings }}</p>
+            <p class="mt-2">{{ product.safety.mainMaterials }} · {{ product.safety.manufacturerBrand }} — {{ product.safety.manufacturerCompany }}</p>
+            <p class="mt-1 whitespace-pre-line">{{ product.safety.manufacturerPostalAddress }} · <a :href="`mailto:${product.safety.manufacturerEmail}`" class="underline underline-offset-4">{{ product.safety.manufacturerEmail }}</a></p>
+          </aside>
           <p v-if="product.stock < 1" class="mt-7 border-l-2 border-[#b58132] pl-4 text-sm leading-6 text-[#986c35]">Ce bijou est actuellement épuisé.</p>
           <ClientOnly>
             <button type="button" class="mt-8 flex min-h-14 w-full items-center justify-center gap-3 bg-[#302722] px-5 text-sm text-white transition hover:bg-[#514137] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 disabled:cursor-not-allowed disabled:opacity-50" :disabled="available < 1" @click="addToCart">
@@ -95,7 +102,7 @@ useSeoMeta({
                 <span>Livraison & retours</span><ChevronDown class="h-4 w-4 shrink-0 text-[#986c35] transition-transform group-open:rotate-180" />
               </summary>
               <div class="pb-6 text-xs leading-6 text-[#776b64]">
-                <p>Livraison à domicile ou en point relais, offerte dès 60 € d’achat.</p>
+                <p>Livraison à domicile ou en point relais, offerte dès 60 € d’achat. Vous disposez de 14 jours à compter du lendemain de la réception pour vous rétracter, sans motif. Les frais de retour sont à votre charge.</p>
                 <NuxtLink to="/livraison" class="mt-2 inline-flex min-h-8 items-center underline underline-offset-4">Voir les délais et modalités</NuxtLink>
               </div>
             </details>

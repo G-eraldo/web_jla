@@ -2,18 +2,22 @@ import { Resend } from "resend";
 import { buildContactEmail, validateContactPayload } from "../utils/contact.js";
 import {
   enforceRateLimit,
-  enforceRequestSize,
+  enforceSameOrigin,
+  readLimitedJsonBody,
+  sendResendEmail,
 } from "../utils/request-security.js";
 
 export default defineEventHandler(async (event) => {
+  enforceSameOrigin(event);
   enforceRateLimit(event, {
     name: "contact",
     limit: 5,
     windowMs: 60 * 60 * 1000,
   });
-  enforceRequestSize(event, 16 * 1024);
 
-  const validation = validateContactPayload(await readBody(event));
+  const validation = validateContactPayload(
+    await readLimitedJsonBody(event, 16 * 1024),
+  );
   if (validation.error) {
     throw createError({ statusCode: 400, message: validation.error });
   }
@@ -31,11 +35,10 @@ export default defineEventHandler(async (event) => {
 
   const email = buildContactEmail(validation.data);
   try {
-    const { error } = await new Resend(config.resendApiKey).emails.send({
+    await sendResendEmail(new Resend(config.resendApiKey), {
       from: config.resendFrom,
       ...email,
     });
-    if (error) throw error;
   } catch {
     throw createError({
       statusCode: 502,
