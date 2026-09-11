@@ -23,8 +23,7 @@ useSeoMeta({
           <h2 class="font-serif text-3xl text-[#302722]">1. Vendeuse et champ d’application</h2>
           <p class="mt-4">La vendeuse est <strong>Julia Touret, entrepreneur individuel, exerçant sous le nom commercial
               Maison JLA</strong>, 5 Rue Joliot-Curie, 80200 Doingt, France. SIREN : <strong>109 541 771</strong>. SIRET
-            : <strong>109 541 771 00019</strong>. La ville du greffe RCS sera indiquée dès confirmation de l’extrait
-            officiel. TVA non applicable, article 293 B du CGI. E-mail : <a
+            : <strong>109 541 771 00019</strong>. RCS Amiens <strong>109 541 771</strong>. TVA non applicable, article 293 B du CGI. E-mail : <a
               class="text-[#9b712d] underline underline-offset-4"
               href="mailto:contact@maisonjla.fr">contact@maisonjla.fr</a>. Téléphone : <a
               class="text-[#9b712d] underline underline-offset-4" href="tel:+33677886909">06 77 88 69 09</a>.</p>
