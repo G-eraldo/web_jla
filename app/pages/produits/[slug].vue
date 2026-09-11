@@ -5,9 +5,9 @@ definePageMeta({ key: route => route.params.slug })
 
 const route = useRoute()
 const { listProducts } = useStoreProducts()
-const { data: products, pending, error, refresh } = await useAsyncData('product-catalog', listProducts)
+const { data: products, pending, error, refresh } = await useAsyncData('product-catalog', listProducts, { server: false })
 const product = computed(() => products.value?.find(item => item.slug === route.params.slug))
-if (!pending.value && !error.value && !product.value) throw createError({ statusCode: 404, statusMessage: 'Bijou introuvable' })
+if (!pending.value && !error.value && !product.value) throw createError({ statusCode: 404, message: 'Bijou introuvable' })
 
 const cart = useCartStore()
 const added = ref(false)
@@ -42,6 +42,10 @@ useSeoMeta({
     <div v-else-if="error" role="alert" class="py-20 text-center">
       <h1 class="font-serif text-3xl">La fiche n’a pas pu être chargée.</h1>
       <button type="button" class="mt-6 min-h-12 bg-[#302722] px-6 text-sm text-white" @click="refresh()">Réessayer</button>
+    </div>
+    <div v-else-if="!product" class="py-20 text-center">
+      <h1 class="font-serif text-3xl">Bijou introuvable.</h1>
+      <NuxtLink to="/collections/tous-les-bijoux" class="mt-6 inline-block bg-[#302722] px-6 py-3 text-sm text-white">Voir tous les bijoux</NuxtLink>
     </div>
     <template v-else-if="product">
       <nav aria-label="Fil d’Ariane" class="flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-[.12em] text-[#8a7b72] sm:gap-3">

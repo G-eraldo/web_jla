@@ -7,7 +7,7 @@ function clientKey(event) {
 export function enforceRequestSize(event, maxBytes) {
   const length = Number(getHeader(event, 'content-length') || 0)
   if (Number.isFinite(length) && length > maxBytes) {
-    throw createError({ statusCode: 413, statusMessage: 'La requête est trop volumineuse.' })
+    throw createError({ statusCode: 413, message: 'La requête est trop volumineuse.' })
   }
 }
 
@@ -33,6 +33,6 @@ export function enforceRateLimit(event, { name, limit, windowMs }) {
   setResponseHeader(event, 'RateLimit-Reset', String(Math.ceil(bucket.resetAt / 1000)))
   if (bucket.count > limit) {
     setResponseHeader(event, 'Retry-After', String(Math.max(1, Math.ceil((bucket.resetAt - now) / 1000))))
-    throw createError({ statusCode: 429, statusMessage: 'Trop de requêtes. Veuillez réessayer dans quelques instants.' })
+    throw createError({ statusCode: 429, message: 'Trop de requêtes. Veuillez réessayer dans quelques instants.' })
   }
 }

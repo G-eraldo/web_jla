@@ -22,13 +22,13 @@ export default defineEventHandler(async event => {
     receivedAt: clean(body?.receivedAt, 10)
   }
   if (!declaration.firstName || !declaration.lastName || !emailPattern.test(declaration.email) || !declaration.orderReference || !declaration.products || !/^\d{4}-\d{2}-\d{2}$/.test(declaration.orderedAt)) {
-    throw createError({ statusCode: 400, statusMessage: 'Veuillez compléter les informations nécessaires à l’identification de la commande.' })
+    throw createError({ statusCode: 400, message: 'Veuillez compléter les informations nécessaires à l’identification de la commande.' })
   }
 
   const apiKey = process.env.RESEND_API_KEY
   const from = process.env.RESEND_FROM
-  const sellerEmail = process.env.RETRACTATION_TO || 'maisonjla@outlook.com'
-  if (!apiKey || !from) throw createError({ statusCode: 503, statusMessage: 'L’envoi est temporairement indisponible. Écrivez à maisonjla@outlook.com.' })
+  const sellerEmail = process.env.RETRACTATION_TO || 'contact@maisonjla.fr'
+  if (!apiKey || !from) throw createError({ statusCode: 503, message: 'L’envoi est temporairement indisponible. Écrivez à contact@maisonjla.fr.' })
 
   const sentAtDate = new Date()
   const sentAt = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeStyle: 'long', timeZone: 'Europe/Paris' }).format(sentAtDate)

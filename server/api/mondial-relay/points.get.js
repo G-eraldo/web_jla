@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   if (!/^\d{5}$/.test(code)) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Renseignez un code postal français à cinq chiffres.",
+      message: "Renseignez un code postal français à cinq chiffres.",
     });
   }
 
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: error.statusCode || 502,
-      statusMessage: error.message || "La recherche Mondial Relay est indisponible. Réessayez dans un instant.",
+      message: error.message || "La recherche Mondial Relay est indisponible. Réessayez dans un instant.",
     });
   }
 });

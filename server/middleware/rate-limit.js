@@ -15,7 +15,7 @@ export default defineEventHandler((event) => {
   const current = (attempts.get(key) || []).filter((timestamp) => timestamp > now - rule.milliseconds)
   if (current.length >= rule.limit) {
     setHeader(event, 'Retry-After', Math.ceil((current[0] + rule.milliseconds - now) / 1000))
-    throw createError({ statusCode: 429, statusMessage: 'Trop de demandes. Veuillez réessayer dans quelques instants.' })
+    throw createError({ statusCode: 429, message: 'Trop de demandes. Veuillez réessayer dans quelques instants.' })
   }
   current.push(now)
   attempts.set(key, current)

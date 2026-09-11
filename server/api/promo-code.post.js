@@ -2,21 +2,21 @@ import { enforceRateLimit } from '../utils/request-security.js'
 
 function strapiHeaders() {
   const token = process.env.STRAPI_API_TOKEN
-  if (!token) throw createError({ statusCode: 503, statusMessage: 'La boutique est en cours de configuration.' })
+  if (!token) throw createError({ statusCode: 503, message: 'La boutique est en cours de configuration.' })
   return { Authorization: `Bearer ${token}` }
 }
 
 export default defineEventHandler(async event => {
   enforceRateLimit(event, { name: 'promo-code', limit: 15, windowMs: 10 * 60 * 1000 })
   if (Number(getHeader(event, 'content-length') || 0) > 2_000) {
-    throw createError({ statusCode: 413, statusMessage: 'La demande est trop volumineuse.' })
+    throw createError({ statusCode: 413, message: 'La demande est trop volumineuse.' })
   }
 
   const body = await readBody(event)
   const code = String(body?.code || '').trim().toUpperCase().slice(0, 40)
   const subtotalAmount = Number(body?.subtotalAmount)
   if (!code || !Number.isFinite(subtotalAmount) || subtotalAmount <= 0) {
-    throw createError({ statusCode: 400, statusMessage: 'Ce code promo est invalide ou expiré.' })
+    throw createError({ statusCode: 400, message: 'Ce code promo est invalide ou expiré.' })
   }
 
   const config = useRuntimeConfig()
@@ -30,9 +30,9 @@ export default defineEventHandler(async event => {
     return response.data
   } catch (error) {
     const statusCode = error?.statusCode === 400 ? 400 : 503
-    const statusMessage = statusCode === 400
+    const message = statusCode === 400
       ? 'Ce code promo est invalide ou expiré.'
       : 'La vérification du code promo est temporairement indisponible.'
-    throw createError({ statusCode, statusMessage })
+    throw createError({ statusCode, message })
   }
 })

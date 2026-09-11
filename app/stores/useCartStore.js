@@ -79,7 +79,7 @@ export const useCartStore = defineStore('cart', {
       } catch (error) {
         if (requestId !== this.promoRequestId) return false
         this.promoStatus = 'error'
-        this.promoMessage = error?.data?.statusMessage || 'Ce code promo est invalide ou expiré.'
+        this.promoMessage = error?.data?.message || 'Ce code promo est invalide ou expiré.'
         return false
       }
     },

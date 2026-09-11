@@ -21,7 +21,7 @@ export function webhookPaymentId(payload) {
 
 export function strapiHeaders() {
   const token = process.env.STRAPI_API_TOKEN
-  if (!token) throw createError({ statusCode: 503, statusMessage: 'La boutique est en cours de configuration.' })
+  if (!token) throw createError({ statusCode: 503, message: 'La boutique est en cours de configuration.' })
   return { Authorization: `Bearer ${token}` }
 }
 
@@ -81,6 +81,13 @@ export async function synchronizeOrderPayment(strapiUrl, order, payment) {
       method: 'PUT',
       headers: strapiHeaders(),
       body: { data }
+    })
+  }
+
+  if (['failed', 'canceled', 'expired'].includes(status)) {
+    await $fetch(`${strapiUrl}/api/orders/${encodeURIComponent(order.documentId)}/release-reservation`, {
+      method: 'POST',
+      headers: strapiHeaders()
     })
   }
 

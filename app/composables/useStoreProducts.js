@@ -2,6 +2,16 @@ import { products as demoProducts } from "~/data/products";
 
 export function useStoreProducts() {
   const config = useRuntimeConfig();
+  const categorySlugs = {
+    collier: "colliers",
+    colliers: "colliers",
+    boucle: "boucles",
+    boucles: "boucles",
+    bracelet: "bracelets",
+    bracelets: "bracelets",
+    bague: "bagues",
+    bagues: "bagues",
+  };
 
   const fallbackDescription =
     "Un bijou Maison JLA imaginé pour illuminer le quotidien.";
@@ -24,6 +34,15 @@ export function useStoreProducts() {
       .join("\n");
 
     return text || fallbackDescription;
+  };
+
+  const categorySlugFor = (category) => {
+    const normalized = String(category || "Bijou")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim()
+      .toLowerCase();
+    return categorySlugs[normalized] || normalized;
   };
 
   const normalizeProduct = (product) => {
@@ -56,9 +75,7 @@ export function useStoreProducts() {
       stock: Number.isInteger(stock) && stock >= 0 ? stock : 0,
       description: getDescriptionText(product.description),
       category: String(product.category || "Bijou").trim(),
-      categorySlug: String(product.category || "Bijou")
-        .trim()
-        .toLowerCase(),
+      categorySlug: categorySlugFor(product.category),
       image: images[0],
       images,
       safety: hasSafetyInformation
@@ -87,7 +104,7 @@ export function useStoreProducts() {
           manufacturerBrand: "Maison JLA",
           manufacturerCompany: "Touret Julia",
           manufacturerPostalAddress: "5 Rue Joliot-Curie\n80200 Doingt\nFrance",
-          manufacturerEmail: "maisonjla@outlook.com",
+          manufacturerEmail: "contact@maisonjla.fr",
           safetyWarnings: "Démonstration locale uniquement.",
         },
       }),

@@ -17,6 +17,16 @@ async function refreshPaymentStatus(reference) {
     paymentStatus.value = 'pending'
   }
 
+  if (paymentStatus.value === 'paid') {
+    cart.clearCart()
+    return
+  }
+
+  if (['canceled', 'failed', 'expired'].includes(paymentStatus.value)) {
+    await navigateTo({ path: '/commande/paiement-annule', query: { reference } }, { replace: true })
+    return
+  }
+
   statusAttempts += 1
   if (paymentStatus.value !== 'paid' && statusAttempts < 6) {
     statusTimer = setTimeout(() => refreshPaymentStatus(reference), 2000)
@@ -25,7 +35,6 @@ async function refreshPaymentStatus(reference) {
 
 onMounted(() => {
   if (typeof route.query.reference !== 'string' || !route.query.reference) return
-  cart.clearCart()
   refreshPaymentStatus(route.query.reference)
 })
 

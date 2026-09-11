@@ -29,7 +29,7 @@ async function sendMessage() {
     await $fetch('/api/contact', { method: 'POST', body: form })
     sent.value = true
   } catch (error) {
-    errorMessage.value = error.data?.statusMessage || 'Le message n’a pas pu être envoyé. Vous pouvez écrire à maisonjla@outlook.com.'
+    errorMessage.value = error.data?.message || 'Le message n’a pas pu être envoyé. Vous pouvez écrire à contact@maisonjla.fr.'
   } finally {
     loading.value = false
   }
@@ -48,7 +48,7 @@ async function sendMessage() {
           <p class="font-medium text-[#302722]">Maison JLA</p>
           <p>5 Rue Joliot-Curie<br>80200 Doingt</p>
           <a class="mt-3 inline-block text-[#9b712d] underline underline-offset-4"
-            href="mailto:maisonjla@outlook.com">maisonjla@outlook.com</a>
+            href="mailto:contact@maisonjla.fr">contact@maisonjla.fr</a>
           <a class="block text-[#9b712d] underline underline-offset-4" href="tel:+33677886909">06 77 88 69 09</a>
         </div>
       </div>

@@ -27,7 +27,7 @@ async function checkout() {
     const result = await $fetch('/api/checkout', { method: 'POST', body: { customer: form, delivery, acceptedTerms: acceptedTerms.value, promoCode: cart.promoCode || null, items: cart.items.map(item => ({ id: item.id, quantity: item.quantity })) } })
     await navigateTo(result.checkoutUrl, { external: true })
   } catch (error) {
-    errorMessage.value = error.data?.statusMessage || error.message || 'Le paiement est indisponible.'
+    errorMessage.value = error.data?.message || error.message || 'Le paiement est indisponible.'
   } finally {
     loading.value = false
   }
@@ -53,7 +53,7 @@ async function searchRelayPoints() {
     relayPoints.value = result.points
     if (!relayPoints.value.length) relayError.value = 'Aucun point relais disponible autour de ce code postal.'
   } catch (error) {
-    relayError.value = error.data?.statusMessage || 'La recherche de points relais est indisponible.'
+    relayError.value = error.data?.message || 'La recherche de points relais est indisponible.'
   } finally {
     relayLoading.value = false
   }
@@ -145,7 +145,7 @@ onBeforeUnmount(() => clearTimeout(relaySearchTimer))
         <p class="mt-3 text-xs leading-5 text-[#776b64]">Livraison prévue sous 3 à 6 jours ouvrés à compter de la confirmation du paiement.</p>
         <label class="mt-5 flex gap-3 text-sm leading-5"><input v-model="acceptedTerms"
             required type="checkbox" class="mt-1"><span>J’accepte les <NuxtLink class="font-medium underline underline-offset-4" to="/conditions-generales-de-vente" target="_blank">conditions générales de vente</NuxtLink> et reconnais avoir lu la <NuxtLink class="font-medium underline underline-offset-4" to="/politique-confidentialite" target="_blank">politique de confidentialité</NuxtLink>.</span></label>
-        <p class="mt-3 text-xs leading-5 text-[#776b64]">Les champs de ce formulaire sont nécessaires pour exécuter la commande, le paiement et la livraison. Maison JLA est responsable du traitement ; Mollie, Resend, Sendcloud et le transporteur reçoivent seulement les données utiles à leur mission. Vos droits s’exercent à maisonjla@outlook.com. Les détails, durées de conservation et transferts éventuels figurent dans la politique de confidentialité.</p>
+        <p class="mt-3 text-xs leading-5 text-[#776b64]">Les champs de ce formulaire sont nécessaires pour exécuter la commande, le paiement et la livraison. Maison JLA est responsable du traitement ; Mollie, Resend, Sendcloud et le transporteur reçoivent seulement les données utiles à leur mission. Vos droits s’exercent à contact@maisonjla.fr. Les détails, durées de conservation et transferts éventuels figurent dans la politique de confidentialité.</p>
         <p v-if="errorMessage" class="mt-5 text-sm text-red-600">{{ errorMessage }}</p><button
           class="mt-6 w-full bg-[#302722] py-4 text-xs uppercase tracking-widest text-white disabled:cursor-not-allowed disabled:opacity-60"
           :disabled="loading">{{ loading ? 'Redirection…' : 'Payer — commande avec obligation de paiement' }}</button>

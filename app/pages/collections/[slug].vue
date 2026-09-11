@@ -5,7 +5,7 @@ const labels = { 'tous-les-bijoux': 'Tous les bijoux', colliers: 'Colliers', bou
 const title = computed(() => labels[route.params.slug] || 'La boutique')
 useSeoMeta({ title: () => `${title.value} — Maison JLA`, description: 'Découvrez les bijoux Maison JLA : colliers, bracelets, bagues et boucles d’oreilles. Trouvez le détail qui vous ressemble.' })
 const { listProducts } = useStoreProducts()
-const { data: products, pending, error, refresh } = await useAsyncData('boutique-catalogue', listProducts, { default: () => [] })
+const { data: products, pending, error, refresh } = await useAsyncData('boutique-catalogue', listProducts, { default: () => [], server: false })
 const search = ref('')
 const sort = ref('selection')
 const availableOnly = ref(false)

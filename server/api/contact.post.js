@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
 
   const validation = validateContactPayload(await readBody(event));
   if (validation.error) {
-    throw createError({ statusCode: 400, statusMessage: validation.error });
+    throw createError({ statusCode: 400, message: validation.error });
   }
 
   if (validation.data.website) return { sent: true };
@@ -24,8 +24,8 @@ export default defineEventHandler(async (event) => {
   if (!config.resendApiKey || !config.resendFrom) {
     throw createError({
       statusCode: 503,
-      statusMessage:
-        "Le formulaire est temporairement indisponible. Écrivez à maisonjla@outlook.com.",
+      message:
+        "Le formulaire est temporairement indisponible. Écrivez à contact@maisonjla.fr.",
     });
   }
 
@@ -39,8 +39,8 @@ export default defineEventHandler(async (event) => {
   } catch {
     throw createError({
       statusCode: 502,
-      statusMessage:
-        "Le message n’a pas pu être envoyé. Vous pouvez écrire à maisonjla@outlook.com.",
+      message:
+        "Le message n’a pas pu être envoyé. Vous pouvez écrire à contact@maisonjla.fr.",
     });
   }
 
