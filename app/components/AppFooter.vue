@@ -62,18 +62,19 @@ import { LockKeyhole, Package, Truck } from 'lucide-vue-next';
         <NuxtLink to="/contact" class="block py-2 text-sm hover:underline underline-offset-4">Contact</NuxtLink>
         <NuxtLink to="/mentions-legales" class="block py-2 text-sm hover:underline underline-offset-4">Mentions légales
         </NuxtLink>
-        <NuxtLink to="/conditions-generales-de-vente" class="block py-2 text-sm hover:underline underline-offset-4">Conditions générales de vente
+        <NuxtLink to="/conditions-generales-de-vente" class="block py-2 text-sm hover:underline underline-offset-4">
+          Conditions générales de vente
         </NuxtLink>
-        <NuxtLink to="/retractation" class="block py-2 text-sm hover:underline underline-offset-4">Renoncer au contrat ici
+        <NuxtLink to="/retractation" class="block py-2 text-sm hover:underline underline-offset-4">Renoncer au contrat
+          ici
         </NuxtLink>
         <NuxtLink to="/politique-confidentialite" class="block py-2 text-sm hover:underline underline-offset-4">
           Politique de confidentialité</NuxtLink>
       </nav>
     </div>
-    <div
-      class="mx-auto flex max-w-7xl flex-col gap-2 border-t border-[#dfd1c7] px-6 py-6 text-[11px] text-[#776b64] sm:flex-row sm:justify-between sm:px-8">
-      <p>© Maison JLA. Tous droits réservés.</p>
-      <p>Les jolis détails du quotidien.</p>
-    </div>
+    <p class="border-t border-[#dfd1c7] px-6 py-6 text-center text-[11px] leading-6 text-[#776b64] sm:px-8">
+      © {{ new Date().getFullYear() }} Maison JLA, tous droits réservés — site édité par
+      <a href="https://lafabriqueducode.fr" target="_blank" rel="noopener noreferrer" class="text-[#a48e7b] underline-offset-4 hover:underline">La Fabrique du Code</a>
+    </p>
   </footer>
 </template>
