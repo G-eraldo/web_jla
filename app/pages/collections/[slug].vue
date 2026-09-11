@@ -1,11 +1,34 @@
 <script setup>
+import { collectionSeo, COLLECTION_SEO } from '~/lib/seo'
+
 definePageMeta({ layout: 'default' })
 const route = useRoute()
-const labels = { 'tous-les-bijoux': 'Tous les bijoux', colliers: 'Colliers', boucles: 'Boucles d’oreilles', bracelets: 'Bracelets', bagues: 'Bagues' }
-const title = computed(() => labels[route.params.slug] || 'La boutique')
-useSeoMeta({ title: () => `${title.value} — Maison JLA`, description: 'Découvrez les bijoux Maison JLA : colliers, bracelets, bagues et boucles d’oreilles. Trouvez le détail qui vous ressemble.' })
+const labels = Object.fromEntries(Object.entries(COLLECTION_SEO).map(([slug, item]) => [slug, item.title]))
+const seo = computed(() => collectionSeo(route.params.slug))
+if (!seo.value) throw createError({ statusCode: 404, message: 'Collection introuvable' })
+const title = computed(() => seo.value.title)
+useSeoMeta({
+  title: () => seo.value.title,
+  description: () => seo.value.description,
+  ogTitle: () => seo.value.title,
+  ogDescription: () => seo.value.description
+})
 const { listProducts } = useStoreProducts()
-const { data: products, pending, error, refresh } = await useAsyncData('boutique-catalogue', listProducts, { default: () => [], server: false })
+const { data: products, pending, error, refresh } = await useAsyncData('product-catalog', listProducts, { default: () => [] })
+useSchemaOrg([
+  defineItemList({
+    name: () => seo.value.title,
+    itemListElement: () => (products.value || [])
+      .filter(product => route.params.slug === 'tous-les-bijoux' || product.categorySlug === route.params.slug)
+      .slice(0, 12)
+      .map((product, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: product.name,
+        url: `/produits/${product.slug}`
+      }))
+  })
+])
 const search = ref('')
 const sort = ref('selection')
 const availableOnly = ref(false)

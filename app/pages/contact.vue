@@ -2,9 +2,9 @@
 definePageMeta({ layout: 'default' })
 
 useSeoMeta({
-  title: 'Contact — Maison JLA',
-  description: 'Une question sur un bijou ou une commande ? Contactez Maison JLA grâce à notre formulaire.',
-  ogTitle: 'Contact — Maison JLA',
+  title: 'Contact',
+  description: 'Une question sur un bijou ou une commande ? Écrivez à Maison JLA : formulaire, e-mail contact@maisonjla.fr ou téléphone.',
+  ogTitle: 'Contact',
   ogDescription: 'Une question sur un bijou ou une commande ? Écrivez-nous, nous vous répondrons avec plaisir.'
 })
 

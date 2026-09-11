@@ -1,7 +1,6 @@
 <script setup>
-definePageMeta({ layout: 'default' })
-
-useSeoMeta({ title: 'Merci pour votre commande — Maison JLA', robots: 'noindex, nofollow' })
+definePageMeta({ layout: 'default', robots: false })
+useSeoMeta({ title: 'Merci pour votre commande', robots: 'noindex, nofollow' })
 
 const route = useRoute()
 const cart = useCartStore()

@@ -1,7 +1,7 @@
 <script setup>
 const { listProducts } = useStoreProducts()
 const cart = useCartStore()
-const { data: products } = await useAsyncData('product-catalog', listProducts, { server: false })
+const { data: products } = await useAsyncData('product-catalog', listProducts)
 watch(products, catalog => {
   if (catalog) cart.hydrateFromCatalog(catalog)
 }, { immediate: true })

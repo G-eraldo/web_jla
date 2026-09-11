@@ -2,10 +2,10 @@
 definePageMeta({ layout: 'default' })
 
 useSeoMeta({
-  title: 'Conditions générales de vente — Maison JLA',
-  description: 'Conditions générales de vente applicables aux commandes passées sur la boutique Maison JLA.',
-  ogTitle: 'Maison JLA — Conditions générales de vente',
-  ogDescription: 'Conditions générales de vente applicables aux commandes passées sur la boutique Maison JLA.'
+  title: 'Conditions générales de vente',
+  description: 'CGV Maison JLA : commande, livraison, rétractation de 14 jours, garanties légales et médiation CM2C.',
+  ogTitle: 'Conditions générales de vente',
+  ogDescription: 'Conditions générales de vente applicables aux commandes Maison JLA.'
 })
 </script>
 

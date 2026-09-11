@@ -1,6 +1,11 @@
 <script setup>
 definePageMeta({ layout: 'default' })
-useSeoMeta({ title: 'L’esprit Maison JLA', description: 'Découvrez l’univers Maison JLA : des bijoux fantaisie à choisir selon vos envies, pour soi ou pour offrir.' })
+useSeoMeta({
+  title: 'L’esprit de la maison',
+  description: 'L’univers Maison JLA : des bijoux fantaisie à choisir selon vos envies, pour soi ou pour offrir, sans attendre une grande occasion.',
+  ogTitle: 'L’esprit de la maison',
+  ogDescription: 'Des bijoux fantaisie à choisir selon vos envies, pour soi ou pour offrir.'
+})
 </script>
 <template>
   <div>

@@ -18,7 +18,12 @@ const freeShippingRemaining = computed(() => amountUntilFreeShipping(cart.total)
 const hasFreeShipping = computed(() => freeShippingRemaining.value === 0)
 const totalAmount = computed(() => cart.totalAfterDiscount + shippingAmount.value)
 
-useSeoMeta({ title: 'Finaliser ma commande — Maison JLA', description: 'Renseignez vos coordonnées et finalisez votre commande Maison JLA en toute sécurité.' })
+definePageMeta({ robots: false })
+useSeoMeta({
+  title: 'Finaliser ma commande',
+  description: 'Renseignez vos coordonnées et finalisez votre commande Maison JLA en toute sécurité.',
+  robots: 'noindex, nofollow'
+})
 
 async function checkout() {
   loading.value = true

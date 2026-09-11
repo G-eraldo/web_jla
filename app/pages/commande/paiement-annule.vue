@@ -1,7 +1,6 @@
 <script setup>
-definePageMeta({ layout: 'default' })
-
-useSeoMeta({ title: 'Paiement annulé — Maison JLA', robots: 'noindex, nofollow' })
+definePageMeta({ layout: 'default', robots: false })
+useSeoMeta({ title: 'Paiement annulé', robots: 'noindex, nofollow' })
 </script>
 
 <template>

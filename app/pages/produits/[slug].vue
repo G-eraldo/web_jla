@@ -5,7 +5,7 @@ definePageMeta({ key: route => route.params.slug })
 
 const route = useRoute()
 const { listProducts } = useStoreProducts()
-const { data: products, pending, error, refresh } = await useAsyncData('product-catalog', listProducts, { server: false })
+const { data: products, pending, error, refresh } = await useAsyncData('product-catalog', listProducts)
 const product = computed(() => products.value?.find(item => item.slug === route.params.slug))
 if (!pending.value && !error.value && !product.value) throw createError({ statusCode: 404, message: 'Bijou introuvable' })
 
@@ -28,12 +28,45 @@ function addToCart() {
 }
 watch(() => route.params.slug, () => { added.value = false; announcement.value = ''; selectedImage.value = 0 })
 useSeoMeta({
-  title: () => `${product.value?.name || 'Nos bijoux'} — Maison JLA`,
-  description: () => product.value?.description?.slice(0, 160),
-  ogTitle: () => `${product.value?.name || 'Nos bijoux'} — Maison JLA`,
+  title: () => product.value?.name || 'Bijou Maison JLA',
+  description: () => {
+    const text = product.value?.description || 'Bijou fantaisie Maison JLA.'
+    const price = product.value ? new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(product.value.price) : ''
+    return `${text.slice(0, 120)}${price ? ` ${price}.` : ''} Livraison en France métropolitaine.`.slice(0, 160)
+  },
+  ogTitle: () => product.value?.name || 'Bijou Maison JLA',
   ogDescription: () => product.value?.description?.slice(0, 160),
-  ogImage: () => product.value?.image
+  ogImage: () => product.value?.image,
+  ogType: 'website'
 })
+useSchemaOrg([
+  defineBreadcrumb({
+    itemListElement: () => product.value
+      ? [
+          { name: 'Accueil', item: '/' },
+          { name: category.value.label, item: category.value.to },
+          { name: product.value.name }
+        ]
+      : []
+  }),
+  defineProduct({
+    name: () => product.value?.name,
+    description: () => product.value?.description,
+    image: () => product.value?.images?.length ? product.value.images : product.value?.image,
+    sku: () => product.value?.safety?.productReference,
+    brand: { '@type': 'Brand', name: 'Maison JLA' },
+    category: () => product.value?.category,
+    offers: () => product.value
+      ? defineOffer({
+          price: product.value.price,
+          priceCurrency: 'EUR',
+          availability: product.value.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+          url: `/produits/${product.value.slug}`,
+          itemCondition: 'https://schema.org/NewCondition'
+        })
+      : undefined
+  })
+])
 </script>
 
 <template>

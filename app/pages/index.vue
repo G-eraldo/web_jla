@@ -1,8 +1,13 @@
 <script setup>
 definePageMeta({ layout: 'default' })
-useSeoMeta({ title: 'Maison JLA — Les petits détails, les grands coups de cœur', description: 'Colliers, bracelets, bagues et boucles d’oreilles : découvrez les bijoux fantaisie Maison JLA et trouvez votre touche de lumière.' })
+useSeoMeta({
+  title: 'Bijoux fantaisie à porter au quotidien',
+  description: 'Colliers, bracelets, bagues et boucles d’oreilles Maison JLA. Des bijoux fantaisie à choisir pour soi ou à offrir, livrés en France métropolitaine.',
+  ogTitle: 'Bijoux fantaisie à porter au quotidien',
+  ogDescription: 'Colliers, bracelets, bagues et boucles d’oreilles Maison JLA. Des bijoux fantaisie à choisir pour soi ou à offrir.'
+})
 const { listProducts } = useStoreProducts()
-const { data: products, pending, error } = await useAsyncData('products', listProducts)
+const { data: products, pending, error } = await useAsyncData('product-catalog', listProducts)
 const categories = computed(() => [
   { slug: 'colliers', name: 'Colliers', note: 'Tout près du cœur' },
   { slug: 'boucles', name: 'Boucles d’oreilles', note: 'Une touche d’éclat' },
@@ -57,7 +62,7 @@ const hero = computed(() => selection.value.find(product => product.categorySlug
         <NuxtLink v-for="category in categories" :key="category.slug" :to="`/collections/${category.slug}`"
           class="group">
           <div class="aspect-[4/5] overflow-hidden rounded-t-full bg-[#f2e9e2]"><img v-if="category.image"
-              :src="category.image" alt="" loading="lazy"
+              :src="category.image" :alt="category.name" loading="lazy"
               class="h-full w-full object-cover transition duration-500 motion-safe:group-hover:scale-105"></div>
           <div class="mt-4 text-center">
             <h3 class="font-serif text-xl sm:text-2xl">{{ category.name }}</h3>

@@ -2,10 +2,10 @@
 definePageMeta({ layout: 'default' })
 
 useSeoMeta({
-  title: 'Politique de confidentialité — Maison JLA',
-  description: 'Politique de confidentialité de la boutique Maison JLA.',
-  ogTitle: 'Maison JLA — Politique de confidentialité',
-  ogDescription: 'Politique de confidentialité de la boutique Maison JLA.'
+  title: 'Politique de confidentialité',
+  description: 'Données collectées, destinataires, durées de conservation et droits RGPD de la boutique Maison JLA.',
+  ogTitle: 'Politique de confidentialité',
+  ogDescription: 'Traitement des données personnelles par Maison JLA.'
 })
 </script>
 

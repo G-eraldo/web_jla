@@ -1,10 +1,9 @@
 <script setup>
-definePageMeta({ layout: 'default' })
-
+definePageMeta({ layout: 'default', robots: false })
 useSeoMeta({
-  title: 'Renoncer au contrat — Maison JLA',
+  title: 'Renoncer au contrat',
   description: 'Exercez en ligne votre droit de rétractation pour une commande Maison JLA.',
-  robots: 'noindex,follow'
+  robots: 'noindex, follow'
 })
 
 const form = reactive({

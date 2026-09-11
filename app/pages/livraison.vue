@@ -1,6 +1,11 @@
 <script setup>
 definePageMeta({ layout: 'default' })
-useSeoMeta({ title: 'Livraison & paiement — Maison JLA', description: 'Livraison offerte dès 60 € d’achat en France métropolitaine, à domicile ou en point relais, et paiement sécurisé.' })
+useSeoMeta({
+  title: 'Livraison et paiement',
+  description: 'Livraison offerte dès 60 € d’achat en France métropolitaine, à domicile ou en point relais Mondial Relay. Paiement par carte bancaire via Mollie.',
+  ogTitle: 'Livraison et paiement',
+  ogDescription: 'Livraison offerte dès 60 € en France métropolitaine, à domicile ou en point relais.'
+})
 </script>
 <template>
   <section class="mx-auto max-w-5xl px-6 py-14 sm:py-20">

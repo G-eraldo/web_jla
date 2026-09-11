@@ -2,10 +2,10 @@
 definePageMeta({ layout: 'default' })
 
 useSeoMeta({
-  title: 'Mentions légales — Maison JLA',
-  description: 'Informations légales concernant la boutique en ligne Maison JLA.',
-  ogTitle: 'Maison JLA — Mentions légales',
-  ogDescription: 'Informations légales concernant la boutique en ligne Maison JLA.'
+  title: 'Mentions légales',
+  description: 'Éditeur, SIREN, RCS Amiens, hébergeur et contact de la boutique en ligne Maison JLA, Julia Touret.',
+  ogTitle: 'Mentions légales',
+  ogDescription: 'Informations légales de la boutique Maison JLA.'
 })
 </script>
 
