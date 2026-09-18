@@ -3,14 +3,20 @@ export default defineEventHandler((event) => {
     /\/$/,
     "",
   );
+  const r2MediaPublicUrl = String(
+    process.env.CLOUDFLARE_R2_MEDIA_PUBLIC_URL || "",
+  ).replace(/\/$/, "");
   const connectSrc = ["'self'", strapiUrl].filter(Boolean).join(" ");
+  const imageSrc = ["'self'", "data:", r2MediaPublicUrl]
+    .filter(Boolean)
+    .join(" ");
   const policy = [
     "default-src 'self'",
     "base-uri 'self'",
     "object-src 'none'",
     "frame-ancestors 'none'",
     "form-action 'self'",
-    "img-src 'self' data: https://res.cloudinary.com",
+    `img-src ${imageSrc}`,
     "font-src 'self'",
     "style-src 'self' 'unsafe-inline'",
     "script-src 'self' 'unsafe-inline'",

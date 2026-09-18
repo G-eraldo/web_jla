@@ -47,7 +47,7 @@ useSeoMeta({
         <section>
           <h2 class="font-serif text-3xl text-[#302722]">4. Destinataires et transferts</h2>
           <p class="mt-4">Les données utiles sont transmises à Mollie (paiement), Resend (e-mails), Sendcloud et le
-            transporteur (livraison), Cloudinary (médias produits), Cloudflare R2 (archive privée des factures), ntfy
+            transporteur (livraison), Cloudflare R2 (médias produits et archive privée des factures), ntfy
             (notification interne limitée à la référence, au montant, au nombre d’articles et au mode de livraison),
             IONOS (hébergement du site, du CMS et de la base) et, le cas échéant, La Fabrique du Code pour la
             maintenance. Elles ne sont ni vendues ni louées. Les régions, contrats de sous-traitance et garanties de
