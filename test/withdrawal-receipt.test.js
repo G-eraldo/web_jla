@@ -9,6 +9,18 @@ const base = {
   email: 'cliente@exemple.fr'
 }
 
+// Réservation factice : l'autorisation rend un objet à trancher (commit si
+// l'envoi est accepté, release sinon) et non un quota déjà définitif.
+const fakeReservation = () => ({
+  settled: false,
+  commit() {
+    this.settled = true
+  },
+  release() {
+    this.settled = true
+  }
+})
+
 test("une adresse différente de celle de la commande est refusée", async () => {
   const checked = []
   const reservations = []
@@ -22,7 +34,7 @@ test("une adresse différente de celle de la commande est refusée", async () =>
     },
     reserve: (entries) => {
       reservations.push(entries)
-      return true
+      return fakeReservation()
     }
   })
 
@@ -51,11 +63,12 @@ test('la casse et les espaces de la référence et de l’adresse sont tolérés
     },
     reserve: (entries) => {
       reservations.push(entries)
-      return true
+      return fakeReservation()
     }
   })
 
-  assert.equal(allowed, true)
+  assert.equal(typeof allowed.commit, 'function', 'l’appelant doit pouvoir trancher la réservation')
+  assert.equal(typeof allowed.release, 'function')
   assert.deepEqual(checked, [
     {
       strapiUrl: 'https://back.example.test',
@@ -81,7 +94,7 @@ test('une vérification impossible (Strapi indisponible) refuse l’envoi', asyn
     },
     reserve: (entries) => {
       reservations.push(entries)
-      return true
+      return fakeReservation()
     }
   })
 
@@ -99,7 +112,7 @@ test('le refus du plafond global ne laisse pas l’envoi du destinataire consomm
     // avoir été débité pour autant.
     reserve: (entries) => {
       reservations.push(entries)
-      return false
+      return null
     }
   })
 
@@ -125,4 +138,17 @@ test('une déclaration sans référence ou sans adresse ne déclenche aucune vé
   assert.equal(await authorizeCustomerReceipt({ ...base, orderReference: '   ', verify }), false)
   assert.equal(await authorizeCustomerReceipt({ ...base, email: '', verify }), false)
   assert.deepEqual(checked, [])
+})
+
+test('une autorisation rend la réservation à trancher par l’appelant', async () => {
+  const handle = fakeReservation()
+
+  const allowed = await authorizeCustomerReceipt({
+    ...base,
+    verify: async () => true,
+    reserve: () => handle
+  })
+
+  assert.equal(allowed, handle, 'le quota ne doit être consommé qu’après un envoi accepté')
+  assert.equal(handle.settled, false)
 })

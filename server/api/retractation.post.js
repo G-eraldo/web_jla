@@ -130,8 +130,10 @@ export default defineEventHandler(async (event) => {
   // confirme que la référence appartient bien à l'adresse déclarée, puis les
   // quotas destinataire et global sont réservés ensemble. Sans ce
   // rapprochement, n'importe qui pouvait déclencher un e-mail vers une adresse
-  // arbitraire depuis l'adresse légitime du domaine.
-  const customerReceiptAllowed = await authorizeCustomerReceipt({
+  // arbitraire depuis l'adresse légitime du domaine. La réservation reste
+  // conditionnelle : elle n'est rendue définitive qu'après un envoi accepté,
+  // et libérée sinon, pour qu'un nouvel essai légitime puisse partir.
+  const customerReservation = await authorizeCustomerReceipt({
     strapiUrl: config.public.strapiUrl,
     orderReference: declaration.orderReference,
     email: declaration.email,
@@ -154,7 +156,7 @@ export default defineEventHandler(async (event) => {
   } catch {
     // Continue with the customer receipt even if the internal alert failed.
   }
-  if (customerReceiptAllowed) {
+  if (customerReservation) {
     try {
       await sendResendEmail(resend, {
         from,
@@ -165,8 +167,14 @@ export default defineEventHandler(async (event) => {
         html: `<h1>Votre rétractation a bien été transmise</h1><p>Conservez cet accusé de réception sur support durable.</p>${htmlDeclaration}<p>Maison JLA vous indiquera les modalités de retour.</p>`,
       });
       customerSent = true;
+      // Envoi accepté : la réservation devient définitive.
+      customerReservation.commit();
     } catch {
-      // The legally operative declaration was already recorded.
+      // The legally operative declaration was already recorded. L'accusé n'est
+      // toutefois pas parti : le quota réservé est rendu immédiatement, sinon
+      // la cliente se verrait refuser une nouvelle déclaration pendant toute
+      // la fenêtre sans avoir jamais reçu d'e-mail.
+      customerReservation.release();
     }
   }
     try {
