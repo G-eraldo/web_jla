@@ -1,4 +1,5 @@
 import { products as demoProducts } from "~/data/products";
+import { fetchAllStrapiPages } from "~/lib/strapi-pagination";
 
 export function useStoreProducts() {
   const config = useRuntimeConfig();
@@ -113,28 +114,30 @@ export function useStoreProducts() {
   const listProducts = async () => {
     try {
       const { find } = useStrapi();
-      const response = await find("products", {
-        fields: ["name", "slug", "price", "stock", "category", "description"],
-        populate: {
-          images: { fields: ["url"] },
-          productSafety: {
-            fields: [
-              "productReference",
-              "batchNumber",
-              "mainMaterials",
-              "manufacturerBrand",
-              "manufacturerCompany",
-              "manufacturerPostalAddress",
-              "manufacturerEmail",
-              "safetyWarnings",
-            ],
+      const products = await fetchAllStrapiPages(({ page, pageSize }) =>
+        find("products", {
+          fields: ["name", "slug", "price", "stock", "category", "description"],
+          populate: {
+            images: { fields: ["url"] },
+            productSafety: {
+              fields: [
+                "productReference",
+                "batchNumber",
+                "mainMaterials",
+                "manufacturerBrand",
+                "manufacturerCompany",
+                "manufacturerPostalAddress",
+                "manufacturerEmail",
+                "safetyWarnings",
+              ],
+            },
           },
-        },
-        pagination: { pageSize: 100 },
-      });
+          pagination: { page, pageSize },
+        }),
+      );
 
-      return response.data?.length
-        ? response.data
+      return products.length
+        ? products
             .map(normalizeProduct)
             .filter((product) => product.safety)
         : import.meta.dev

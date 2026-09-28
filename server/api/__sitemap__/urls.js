@@ -1,3 +1,5 @@
+import { fetchAllStrapiPages } from '../../../app/lib/strapi-pagination.js'
+
 export default defineSitemapEventHandler(async () => {
   const config = useRuntimeConfig()
   const strapiUrl = String(config.public.strapiUrl || '').replace(/\/$/, '')
@@ -9,15 +11,18 @@ export default defineSitemapEventHandler(async () => {
   }))
 
   try {
-    const response = await $fetch(`${strapiUrl}/api/products`, {
-      query: {
-        'fields[0]': 'slug',
-        'fields[1]': 'updatedAt',
-        'populate[images][fields][0]': 'url',
-        'pagination[pageSize]': 100
-      }
-    })
-    for (const product of response.data || []) {
+    const products = await fetchAllStrapiPages(({ page, pageSize }) =>
+      $fetch(`${strapiUrl}/api/products`, {
+        query: {
+          'fields[0]': 'slug',
+          'fields[1]': 'updatedAt',
+          'populate[images][fields][0]': 'url',
+          'pagination[page]': page,
+          'pagination[pageSize]': pageSize
+        }
+      })
+    )
+    for (const product of products) {
       if (!product.slug) continue
       const image = product.images?.[0]?.url
       urls.push({

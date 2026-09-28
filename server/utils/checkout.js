@@ -58,9 +58,16 @@ export function checkoutFingerprint({ customer, delivery, items, promoCode }) {
   return createHash("sha256")
     .update(
       JSON.stringify({
-        email: String(customer?.email || "")
-          .trim()
-          .toLowerCase(),
+        customer: {
+          firstName: String(customer?.firstName || "").trim(),
+          lastName: String(customer?.lastName || "").trim(),
+          email: String(customer?.email || "").trim().toLowerCase(),
+          phone: String(customer?.phone || "").trim(),
+          addressLine1: String(customer?.addressLine1 || "").trim(),
+          addressLine2: String(customer?.addressLine2 || "").trim(),
+          postalCode: String(customer?.postalCode || "").trim(),
+          city: String(customer?.city || "").trim(),
+        },
         items,
         delivery: {
           method: delivery?.method,

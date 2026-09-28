@@ -88,7 +88,7 @@ export async function synchronizeOrderPayment(strapiUrl, order, payment) {
       {
         method: "POST",
         headers: strapiHeaders(),
-        body: { data: { paidAt: payment.paidAt || new Date().toISOString() } },
+        body: { data: {} },
       },
     );
     return { status, refundRequired: Boolean(response?.data?.refundRequired) };

@@ -63,7 +63,7 @@ function changePage(nextPage) {
     <section class="border-b border-[#e8ded5] bg-[#f6eee9] px-5 py-12 text-center sm:px-8 sm:py-16">
       <p class="text-[10px] uppercase tracking-[0.25em] text-[#947756]">La collection Maison JLA</p>
       <h1 class="mt-4 font-serif text-4xl text-[#382b25] sm:text-6xl">{{ title }}</h1>
-      <p class="mx-auto mt-5 max-w-lg text-sm leading-7 text-[#78695f]">Des bijoux à choisir pour soi, à offrir, à porter encore et encore. Le plus beau détail, c’est le vôtre.</p>
+      <p class="mx-auto mt-5 max-w-lg text-sm leading-7 text-[#78695f]">{{ seo.intro }}</p>
     </section>
     <section class="mx-auto max-w-7xl px-5 pb-16 pt-7 sm:px-8 sm:pb-24">
       <nav aria-label="Catégories de bijoux" class="flex flex-wrap justify-center gap-2 border-b border-[#e8ded5] pb-7">

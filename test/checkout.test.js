@@ -21,6 +21,10 @@ test('creates a stable checkout fingerprint for retries', () => {
     ...payload,
     customer: { email: ' a@maisonjla.fr ' }
   }))
+  assert.notEqual(checkoutFingerprint(payload), checkoutFingerprint({
+    ...payload,
+    customer: { ...payload.customer, addressLine1: 'Nouvelle adresse' }
+  }))
 })
 
 test('treats a Resend error payload as a failed send', async () => {

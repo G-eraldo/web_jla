@@ -2,6 +2,10 @@ import { strapiHeaders } from './mollie-order.js'
 
 export async function requestAutomaticRefund(client, strapiUrl, order, payment) {
   const refundPath = `${strapiUrl}/api/orders/${encodeURIComponent(order.documentId)}`
+  const claim = await $fetch(`${refundPath}/claim-refund`, {
+    method: 'POST', headers: strapiHeaders()
+  })
+  if (!claim?.data?.claimed) return null
   try {
     const refund = await client.paymentRefunds.create({
       paymentId: payment.id,
@@ -15,9 +19,8 @@ export async function requestAutomaticRefund(client, strapiUrl, order, payment) 
     })
     return refund
   } catch (error) {
-    await $fetch(`${refundPath}/record-refund-failure`, {
-      method: 'POST', headers: strapiHeaders()
-    })
+    // The PSP response may have been lost after accepting the refund. Leave the
+    // durable processing claim for reconciliation instead of issuing it again.
     throw error
   }
 }

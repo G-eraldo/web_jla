@@ -3,6 +3,7 @@ import {
   findOrderByDocumentId,
   findOrderByPaymentId,
   orderDocumentId,
+  strapiHeaders,
   synchronizeOrderPayment,
   webhookPaymentId,
 } from "../../utils/mollie-order.js";
@@ -61,10 +62,18 @@ export default defineEventHandler(async (event) => {
   const payment = await client.payments.get(paymentId);
   const documentId = orderDocumentId(payment.metadata);
   const strapiUrl = config.public.strapiUrl.replace(/\/$/, "");
-  const order = documentId
+  let order = documentId
     ? await findOrderByDocumentId(strapiUrl, documentId)
     : await findOrderByPaymentId(strapiUrl, payment.id);
   if (!order) return { ok: true };
+  if (!order.molliePaymentId && documentId) {
+    await $fetch(`${strapiUrl}/api/orders/${encodeURIComponent(documentId)}/attach-payment`, {
+      method: "POST",
+      headers: strapiHeaders(),
+      body: { data: { molliePaymentId: payment.id } },
+    });
+    order = await findOrderByDocumentId(strapiUrl, documentId);
+  }
   const result = await synchronizeOrderPayment(strapiUrl, order, payment);
   if (result.refundRequired)
     await requestAutomaticRefund(client, strapiUrl, order, payment);

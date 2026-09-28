@@ -120,24 +120,26 @@ export default defineEventHandler(async (event) => {
   }
 
   const siteUrl = config.public.siteUrl.replace(/\/$/, "");
+  const mollie = createMollieClient({ apiKey: config.mollieApiKey });
   if (order.molliePaymentId) {
     try {
-      const existing = await createMollieClient({
-        apiKey: config.mollieApiKey,
-      }).payments.get(order.molliePaymentId);
+      const existing = await mollie.payments.get(order.molliePaymentId);
       const checkoutUrl =
         existing.getCheckoutUrl?.() || existing._links?.checkout?.href;
-      if (checkoutUrl) return { checkoutUrl, reference: order.reference };
+      if (["open", "pending"].includes(existing.status) && checkoutUrl)
+        return { checkoutUrl, reference: order.reference };
     } catch {
-      // Fall through and create a fresh payment for this reservation.
+      // An uncertain lookup must never create another payment for this order.
     }
+    throw createError({
+      statusCode: 409,
+      message: "Ce paiement ne peut plus être repris. Veuillez réessayer dans quelques instants.",
+    });
   }
 
   let payment;
   try {
-    payment = await createMollieClient({
-      apiKey: config.mollieApiKey,
-    }).payments.create({
+    payment = await mollie.payments.create({
       amount: {
         currency: "EUR",
         value: Number(order.totalAmount).toFixed(2),
@@ -145,6 +147,8 @@ export default defineEventHandler(async (event) => {
       description: `Maison JLA · ${order.reference}`,
       redirectUrl: `${siteUrl}/commande/merci?reference=${encodeURIComponent(order.reference)}`,
       metadata: { orderDocumentId: order.documentId },
+      // Stable for this reservation: concurrent requests receive the same payment.
+      idempotencyKey: `maison-jla-order-${order.documentId}`,
       ...(!siteUrl.includes("localhost") && !siteUrl.includes("127.0.0.1")
         ? { webhookUrl: `${siteUrl}/api/mollie/webhook` }
         : {}),
@@ -158,16 +162,12 @@ export default defineEventHandler(async (event) => {
       },
     );
   } catch (error) {
-    try {
-      await $fetch(
-        `${strapiUrl}/api/orders/${encodeURIComponent(order.documentId)}/release-reservation`,
-        { method: "POST", headers: strapiHeaders() },
-      );
-    } catch {}
+    // Mollie may have accepted the request even when the response or attachment
+    // failed. Keep the reservation for webhook/reconciliation to recover it.
     throw createError({
       statusCode: 502,
       message:
-        "Le paiement est temporairement indisponible. Aucun montant n’a été débité.",
+        "Le paiement est temporairement indisponible. Veuillez réessayer sans modifier votre panier.",
     });
   }
 
