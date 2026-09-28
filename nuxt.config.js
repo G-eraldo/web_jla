@@ -62,5 +62,12 @@ export default defineNuxtConfig({
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
       strapiUrl: process.env.STRAPI_URL || 'http://localhost:1337'
     }
+  },
+  // Les sources des builds ne doivent pas être publiables : les sourcemaps
+  // serveur sont générées par défaut et exposeraient la logique du tunnel
+  // de paiement si un artefact ou un répertoire de build fuitait.
+  sourcemap: {
+    server: false,
+    client: false
   }
 })

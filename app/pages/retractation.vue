@@ -47,8 +47,9 @@ async function confirmWithdrawal() {
       <p class="text-xs uppercase tracking-[.2em] text-[#9b712d]">Droit de rétractation</p>
       <h1 class="mt-4 font-serif text-5xl text-[#302722] sm:text-6xl">Renoncer au contrat ici</h1>
       <p class="mt-6 max-w-2xl text-sm leading-7 text-[#776b64]">Ce formulaire permet de notifier en ligne votre
-        rétractation. Vous recevrez un accusé de réception par e-mail avec le contenu, la date et l’heure de votre
-        demande.</p>
+        rétractation. Après vérification de la commande, un accusé de réception reprenant le contenu, la date et l’heure
+        de votre demande est adressé à l’e-mail utilisé lors de la commande. Si l’accusé est en attente, conservez cette
+        page jusqu’à sa réception.</p>
 
       <div v-if="receipt" class="mt-10 border border-[#bfa36d] bg-white p-6 text-sm leading-7 text-[#514640] sm:p-8"
         role="status">
@@ -71,7 +72,7 @@ async function confirmWithdrawal() {
               class="mt-2 w-full border border-[#d9d0c8] bg-white p-4"></label>
           <label class="text-sm">Nom<input v-model.trim="form.lastName" required autocomplete="family-name"
               class="mt-2 w-full border border-[#d9d0c8] bg-white p-4"></label>
-          <label class="text-sm sm:col-span-2">E-mail pour l’accusé de réception<input v-model.trim="form.email"
+          <label class="text-sm sm:col-span-2">E-mail utilisé lors de la commande<input v-model.trim="form.email"
               required type="email" autocomplete="email"
               class="mt-2 w-full border border-[#d9d0c8] bg-white p-4"></label>
           <label class="text-sm sm:col-span-2">Numéro de commande<input v-model.trim="form.orderReference" required

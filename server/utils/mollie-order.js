@@ -58,6 +58,25 @@ export async function findOrderByReference(strapiUrl, reference) {
   );
 }
 
+/**
+ * Demande à Strapi si la référence et l'adresse déclarée appartiennent à la
+ * même commande. Strapi ne répond qu'un booléen : l'adresse enregistrée dans
+ * la commande ne circule jamais. Toute erreur (route absente, réseau, 5xx) est
+ * propagée à l'appelant, qui doit la traiter comme un refus : sans preuve du
+ * lien commande/adresse, aucun accusé ne part.
+ */
+export async function verifyOrderCustomerEmail(strapiUrl, reference, email) {
+  const response = await $fetch(
+    `${strapiUrl.replace(/\/$/, "")}/api/orders/by-reference/${encodeURIComponent(reference)}/verify-customer-email`,
+    {
+      method: "POST",
+      headers: strapiHeaders(),
+      body: { email },
+    },
+  );
+  return response?.data?.match === true;
+}
+
 export async function synchronizeOrderPayment(strapiUrl, order, payment) {
   if (!order || order.molliePaymentId !== payment.id)
     return { status: null, refundRequired: false };
