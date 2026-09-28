@@ -1,10 +1,13 @@
 import { Resend } from "resend";
+import { randomUUID } from "node:crypto";
 import {
+  consumeQuota,
   enforceRateLimit,
   enforceSameOrigin,
   readLimitedJsonBody,
   sendResendEmail,
 } from "../utils/request-security.js";
+import { findOrderByReference } from "../utils/mollie-order.js";
 import {
   persistWithdrawal,
   recordWithdrawalEmails,
@@ -38,6 +41,15 @@ const escapeHtml = (value) =>
       })[character],
   );
 
+const withdrawalDate = (date) =>
+  new Intl.DateTimeFormat("fr-FR", {
+    dateStyle: "long",
+    timeStyle: "long",
+    timeZone: "Europe/Paris",
+  }).format(date);
+const fakeWithdrawalReference = (date) =>
+  `RET-${date.toISOString().slice(0, 10).replaceAll("-", "")}-${randomUUID().slice(0, 8).toUpperCase()}`;
+
 export default defineEventHandler(async (event) => {
   enforceSameOrigin(event);
   enforceRateLimit(event, {
@@ -53,11 +65,15 @@ export default defineEventHandler(async (event) => {
     });
   }
   if (body?.website) {
-    throw createError({
-      statusCode: 400,
-      message:
-        "La demande n’a pas pu être envoyée. Vous pouvez écrire à contact@maisonjla.fr.",
-    });
+    // Champ piège rempli : répondre comme si la déclaration avait été
+    // enregistrée, sans rien persister ni envoyer. Un rejet explicite
+    // indiquerait au robot quel champ conditionne l'acceptation.
+    const trapDate = new Date();
+    return {
+      reference: fakeWithdrawalReference(trapDate),
+      sentAt: withdrawalDate(trapDate),
+      receiptPending: false,
+    };
   }
 
   const declaration = {
@@ -98,11 +114,7 @@ export default defineEventHandler(async (event) => {
     });
 
   const sentAtDate = new Date();
-  const sentAt = new Intl.DateTimeFormat("fr-FR", {
-    dateStyle: "long",
-    timeStyle: "long",
-    timeZone: "Europe/Paris",
-  }).format(sentAtDate);
+  const sentAt = withdrawalDate(sentAtDate);
   const config = useRuntimeConfig();
   const saved = await persistWithdrawal({
     strapiUrl: config.public.strapiUrl,
@@ -114,6 +126,33 @@ export default defineEventHandler(async (event) => {
   const plainDeclaration = `Nom : ${declaration.firstName} ${declaration.lastName}\nE-mail : ${declaration.email}\nCommande : ${declaration.orderReference}\nProduits : ${declaration.products}\nDate de commande : ${declaration.orderedAt}\nDate de réception : ${declaration.receivedAt || "non renseignée"}\nDéclaration envoyée le : ${sentAt}\nRéférence : ${reference}`;
   const htmlDeclaration = `<dl><dt><strong>Nom</strong></dt><dd>${escapeHtml(declaration.firstName)} ${escapeHtml(declaration.lastName)}</dd><dt><strong>E-mail</strong></dt><dd>${escapeHtml(declaration.email)}</dd><dt><strong>Commande</strong></dt><dd>${escapeHtml(declaration.orderReference)}</dd><dt><strong>Produit ou produits</strong></dt><dd>${escapeHtml(declaration.products).replaceAll("\n", "<br>")}</dd><dt><strong>Date de commande</strong></dt><dd>${escapeHtml(declaration.orderedAt)}</dd><dt><strong>Date de réception</strong></dt><dd>${escapeHtml(declaration.receivedAt || "non renseignée")}</dd><dt><strong>Envoi</strong></dt><dd>${escapeHtml(sentAt)}</dd><dt><strong>Référence</strong></dt><dd>${reference}</dd></dl>`;
   const resend = new Resend(apiKey);
+
+  // L'accusé de réception ne part que vers un client dont la commande existe
+  // réellement dans la boutique, et une seule fois par adresse et par jour.
+  // Sans ce contrôle, n'importe qui pouvait déclencher un e-mail vers une
+  // adresse arbitraire depuis l'adresse légitime du domaine.
+  let customerReceiptAllowed = false;
+  try {
+    const order = await findOrderByReference(
+      config.public.strapiUrl,
+      declaration.orderReference.toUpperCase(),
+    );
+    customerReceiptAllowed = Boolean(order);
+  } catch {
+    customerReceiptAllowed = false;
+  }
+  if (customerReceiptAllowed) {
+    const perRecipient = consumeQuota(
+      "retractation-recipient",
+      declaration.email,
+      { limit: 1, windowMs: 24 * 60 * 60 * 1000 },
+    );
+    const globalDaily = consumeQuota("retractation-global", "all", {
+      limit: 30,
+      windowMs: 24 * 60 * 60 * 1000,
+    });
+    customerReceiptAllowed = perRecipient && globalDaily;
+  }
 
   let sellerSent = false;
   let customerSent = false;
@@ -132,19 +171,21 @@ export default defineEventHandler(async (event) => {
   } catch {
     // Continue with the customer receipt even if the internal alert failed.
   }
-  try {
-    await sendResendEmail(resend, {
-      from,
-      to: declaration.email,
-      replyTo: sellerEmail,
-      subject: `Accusé de réception de votre rétractation — Maison JLA`,
-      text: `Votre déclaration de rétractation a été transmise à Maison JLA.\n\n${plainDeclaration}\n\nConservez cet e-mail. Maison JLA vous indiquera les modalités de retour.`,
-      html: `<h1>Votre rétractation a bien été transmise</h1><p>Conservez cet accusé de réception sur support durable.</p>${htmlDeclaration}<p>Maison JLA vous indiquera les modalités de retour.</p>`,
-    });
-    customerSent = true;
-  } catch {
-    // The legally operative declaration was already recorded.
-  } finally {
+  if (customerReceiptAllowed) {
+    try {
+      await sendResendEmail(resend, {
+        from,
+        to: declaration.email,
+        replyTo: sellerEmail,
+        subject: `Accusé de réception de votre rétractation — Maison JLA`,
+        text: `Votre déclaration de rétractation a été transmise à Maison JLA.\n\n${plainDeclaration}\n\nConservez cet e-mail. Maison JLA vous indiquera les modalités de retour.`,
+        html: `<h1>Votre rétractation a bien été transmise</h1><p>Conservez cet accusé de réception sur support durable.</p>${htmlDeclaration}<p>Maison JLA vous indiquera les modalités de retour.</p>`,
+      });
+      customerSent = true;
+    } catch {
+      // The legally operative declaration was already recorded.
+    }
+  }
     try {
       await recordWithdrawalEmails({
         strapiUrl: config.public.strapiUrl,
@@ -156,7 +197,6 @@ export default defineEventHandler(async (event) => {
     } catch {
       // The declaration remains stored; an administrator can safely resend it.
     }
-  }
 
   if (!customerSent) {
     return { reference, sentAt, receiptPending: true };

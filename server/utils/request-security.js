@@ -102,17 +102,25 @@ export function enforceSameOrigin(event) {
     /\/$/,
     "",
   );
-  if (!siteUrl) return;
-  const site = new URL(siteUrl);
   const originHeader = getHeader(event, "origin");
   const refererHeader = getHeader(event, "referer");
   const candidate = originHeader || refererHeader;
+  if (!siteUrl) {
+    // Échec fermé : sans URL de site configurée, aucun contrôle d'origine
+    // n'est possible. Mieux vaut refuser les requêtes d'état que de laisser
+    // disparaître silencieusement la seule protection anti-CSRF des POST.
+    throw createError({
+      statusCode: 403,
+      message: "Origine de la requête non vérifiable.",
+    });
+  }
   if (!candidate) {
     throw createError({
       statusCode: 403,
       message: "Origine de la requête manquante.",
     });
   }
+  const site = new URL(siteUrl);
   let parsed;
   try {
     parsed = new URL(candidate);
@@ -143,3 +151,35 @@ export async function sendResendEmail(resend, payload) {
 }
 
 export { clientKey };
+
+const quotas = new Map();
+
+function pruneQuotas(now) {
+  if (quotas.size <= 5_000) return;
+  for (const [quotaKey, value] of quotas) {
+    if (value.resetAt <= now) quotas.delete(quotaKey);
+  }
+}
+
+/**
+ * Consomme un quota simple, en mémoire du process (comme les limites de débit :
+ * remis à zéro au redéploiement). Retourne false quand le quota est épuisé.
+ * Sert à plafonner les envois d'e-mails, par destinataire et globalement.
+ */
+export function consumeQuota(name, key, { limit, windowMs }) {
+  const now = Date.now();
+  const quotaKey = `${name}:${String(key || "unknown").trim().toLowerCase()}`;
+  const previous = quotas.get(quotaKey);
+  const bucket =
+    !previous || previous.resetAt <= now
+      ? { count: 0, resetAt: now + windowMs }
+      : previous;
+  if (bucket.count >= limit) {
+    quotas.set(quotaKey, bucket);
+    return false;
+  }
+  bucket.count += 1;
+  quotas.set(quotaKey, bucket);
+  pruneQuotas(now);
+  return true;
+}
