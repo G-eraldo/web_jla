@@ -40,6 +40,10 @@ export function normalizeOrderReference(value) {
  * réservés ensemble, pour qu'un refus du plafond global ne consomme pas
  * l'envoi quotidien du destinataire.
  *
+ * Retourne la réservation de quotas — que l'appelant committe si l'envoi est
+ * accepté, ou libère sinon —, et `false` quand l'envoi n'est pas autorisé.
+ * La réservation n'est donc pas consommée tant que rien n'est parti.
+ *
  * Toute erreur de vérification (Strapi indisponible, route absente, réponse
  * inattendue) refuse l'envoi : l'échec est fermé, la déclaration reste
  * enregistrée et l'accusé est signalé comme en attente.
@@ -63,5 +67,9 @@ export async function authorizeCustomerReceipt({
   }
   if (!matches) return false;
 
-  return reserve([{ ...RECIPIENT_QUOTA, key: recipient }, GLOBAL_QUOTA]);
+  const reservation = reserve([
+    { ...RECIPIENT_QUOTA, key: recipient },
+    GLOBAL_QUOTA,
+  ]);
+  return reservation || false;
 }

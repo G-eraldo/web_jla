@@ -167,6 +167,15 @@ function pruneQuotas(now) {
  * vérification et l'incrément). Sans cette atomicité, un destinataire pouvait
  * perdre son unique envoi quotidien alors que le plafond global refusait
  * l'envoi, puis rester bloqué après la réouverture du quota global.
+ *
+ * La réservation reste réversible jusqu'à `commit()` : un appelant qui n'a
+ * finalement rien envoyé appelle `release()`, qui rend les compteurs. Sans
+ * cela, un envoi refusé par le fournisseur d'e-mail (erreur transitoire, panne
+ * d'API) consommait le quota sans qu'aucun message ne parte, et un nouvel essai
+ * légitime se faisait refuser pendant toute la fenêtre.
+ *
+ * Retourne la réservation à committer ou à libérer, ou `null` si au moins un
+ * plafond est atteint — dans ce cas aucun compteur n'a été touché.
  */
 export function reserveQuotas(entries) {
   const now = Date.now();
@@ -179,7 +188,7 @@ export function reserveQuotas(entries) {
       !previous || previous.resetAt <= now
         ? { count: 0, resetAt: now + windowMs }
         : previous;
-    if (bucket.count >= limit) return false;
+    if (bucket.count >= limit) return null;
     reservations.push({ quotaKey, bucket });
   }
 
@@ -188,7 +197,28 @@ export function reserveQuotas(entries) {
     quotas.set(quotaKey, bucket);
   }
   pruneQuotas(now);
-  return true;
+
+  let settled = false;
+  return {
+    /** L'envoi a eu lieu : le quota reste consommé. */
+    commit() {
+      settled = true;
+    },
+    /**
+     * L'envoi n'a pas eu lieu : rendre les compteurs réservés. Sans effet si la
+     * réservation a déjà été tranchée, pour qu'un `catch` ne rende jamais un
+     * quota déjà consommé par un e-mail réellement parti.
+     */
+    release() {
+      if (settled) return false;
+      settled = true;
+      for (const { quotaKey, bucket } of reservations) {
+        if (quotas.get(quotaKey) !== bucket) continue;
+        bucket.count = Math.max(0, bucket.count - 1);
+      }
+      return true;
+    },
+  };
 }
 
 /**
@@ -197,5 +227,8 @@ export function reserveQuotas(entries) {
  * Sert à plafonner les envois d'e-mails, par destinataire et globalement.
  */
 export function consumeQuota(name, key, { limit, windowMs }) {
-  return reserveQuotas([{ name, key, limit, windowMs }]);
+  const reservation = reserveQuotas([{ name, key, limit, windowMs }]);
+  if (!reservation) return false;
+  reservation.commit();
+  return true;
 }
