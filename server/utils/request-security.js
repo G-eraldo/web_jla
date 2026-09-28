@@ -162,24 +162,40 @@ function pruneQuotas(now) {
 }
 
 /**
+ * Réserve plusieurs quotas en une seule opération : tous les plafonds sont
+ * vérifiés avant qu'aucun compteur ne soit incrémenté (aucun `await` entre la
+ * vérification et l'incrément). Sans cette atomicité, un destinataire pouvait
+ * perdre son unique envoi quotidien alors que le plafond global refusait
+ * l'envoi, puis rester bloqué après la réouverture du quota global.
+ */
+export function reserveQuotas(entries) {
+  const now = Date.now();
+  const reservations = [];
+
+  for (const { name, key, limit, windowMs } of entries) {
+    const quotaKey = `${name}:${String(key || "unknown").trim().toLowerCase()}`;
+    const previous = quotas.get(quotaKey);
+    const bucket =
+      !previous || previous.resetAt <= now
+        ? { count: 0, resetAt: now + windowMs }
+        : previous;
+    if (bucket.count >= limit) return false;
+    reservations.push({ quotaKey, bucket });
+  }
+
+  for (const { quotaKey, bucket } of reservations) {
+    bucket.count += 1;
+    quotas.set(quotaKey, bucket);
+  }
+  pruneQuotas(now);
+  return true;
+}
+
+/**
  * Consomme un quota simple, en mémoire du process (comme les limites de débit :
  * remis à zéro au redéploiement). Retourne false quand le quota est épuisé.
  * Sert à plafonner les envois d'e-mails, par destinataire et globalement.
  */
 export function consumeQuota(name, key, { limit, windowMs }) {
-  const now = Date.now();
-  const quotaKey = `${name}:${String(key || "unknown").trim().toLowerCase()}`;
-  const previous = quotas.get(quotaKey);
-  const bucket =
-    !previous || previous.resetAt <= now
-      ? { count: 0, resetAt: now + windowMs }
-      : previous;
-  if (bucket.count >= limit) {
-    quotas.set(quotaKey, bucket);
-    return false;
-  }
-  bucket.count += 1;
-  quotas.set(quotaKey, bucket);
-  pruneQuotas(now);
-  return true;
+  return reserveQuotas([{ name, key, limit, windowMs }]);
 }

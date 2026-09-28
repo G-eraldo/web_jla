@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-const { consumeQuota, enforceSameOrigin } = await import('../server/utils/request-security.js')
+const { consumeQuota, enforceSameOrigin, reserveQuotas } = await import('../server/utils/request-security.js')
 
 function stubGlobals({ siteUrl }) {
   globalThis.useRuntimeConfig = () => ({ public: { siteUrl } })
@@ -90,6 +90,70 @@ test('un quota global plafonne le volume total', () => {
   }
 
   assert.equal(allowed, 2)
+})
+
+test('la réservation groupée autorise quand les deux quotas sont disponibles', () => {
+  const recipientQuota = freshName('retractation-recipient')
+  const globalQuota = freshName('retractation-global')
+  const entries = [
+    { name: recipientQuota, key: 'cliente@exemple.fr', limit: 1, windowMs: 60_000 },
+    { name: globalQuota, key: 'all', limit: 1, windowMs: 60_000 }
+  ]
+
+  assert.equal(reserveQuotas(entries), true)
+  assert.equal(reserveQuotas(entries), false)
+})
+
+test('un refus du plafond global ne consomme pas le quota du destinataire', () => {
+  const recipientQuota = freshName('retractation-recipient')
+  const globalQuota = freshName('retractation-global')
+
+  // Le plafond global est saturé par d'autres destinataires.
+  assert.equal(reserveQuotas([{ name: globalQuota, key: 'all', limit: 2, windowMs: 60_000 }]), true)
+  assert.equal(reserveQuotas([{ name: globalQuota, key: 'all', limit: 2, windowMs: 60_000 }]), true)
+  assert.equal(
+    reserveQuotas([
+      { name: recipientQuota, key: 'cliente@exemple.fr', limit: 1, windowMs: 60_000 },
+      { name: globalQuota, key: 'all', limit: 2, windowMs: 60_000 }
+    ]),
+    false
+  )
+
+  // Le plafond global rouvert, l'envoi du destinataire est toujours intact.
+  const reopenedGlobal = freshName('retractation-global')
+  assert.equal(
+    reserveQuotas([
+      { name: recipientQuota, key: 'cliente@exemple.fr', limit: 1, windowMs: 60_000 },
+      { name: reopenedGlobal, key: 'all', limit: 2, windowMs: 60_000 }
+    ]),
+    true
+  )
+})
+
+test('un refus du quota destinataire ne consomme pas le plafond global', () => {
+  const recipientQuota = freshName('retractation-recipient')
+  const globalQuota = freshName('retractation-global')
+
+  assert.equal(
+    reserveQuotas([{ name: recipientQuota, key: 'cliente@exemple.fr', limit: 1, windowMs: 60_000 }]),
+    true
+  )
+  assert.equal(
+    reserveQuotas([
+      { name: recipientQuota, key: 'cliente@exemple.fr', limit: 1, windowMs: 60_000 },
+      { name: globalQuota, key: 'all', limit: 1, windowMs: 60_000 }
+    ]),
+    false
+  )
+
+  // Le plafond global est intact : un autre destinataire passe encore.
+  assert.equal(
+    reserveQuotas([
+      { name: recipientQuota, key: 'autre@exemple.fr', limit: 1, windowMs: 60_000 },
+      { name: globalQuota, key: 'all', limit: 1, windowMs: 60_000 }
+    ]),
+    true
+  )
 })
 
 test('le quota se réinitialise après la fenêtre', async () => {

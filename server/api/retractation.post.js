@@ -1,17 +1,16 @@
 import { Resend } from "resend";
 import { randomUUID } from "node:crypto";
 import {
-  consumeQuota,
   enforceRateLimit,
   enforceSameOrigin,
   readLimitedJsonBody,
   sendResendEmail,
 } from "../utils/request-security.js";
-import { findOrderByReference } from "../utils/mollie-order.js";
 import {
   persistWithdrawal,
   recordWithdrawalEmails,
 } from "../utils/withdrawal.js";
+import { authorizeCustomerReceipt } from "../utils/withdrawal-receipt.js";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const allowedFields = new Set([
@@ -127,32 +126,16 @@ export default defineEventHandler(async (event) => {
   const htmlDeclaration = `<dl><dt><strong>Nom</strong></dt><dd>${escapeHtml(declaration.firstName)} ${escapeHtml(declaration.lastName)}</dd><dt><strong>E-mail</strong></dt><dd>${escapeHtml(declaration.email)}</dd><dt><strong>Commande</strong></dt><dd>${escapeHtml(declaration.orderReference)}</dd><dt><strong>Produit ou produits</strong></dt><dd>${escapeHtml(declaration.products).replaceAll("\n", "<br>")}</dd><dt><strong>Date de commande</strong></dt><dd>${escapeHtml(declaration.orderedAt)}</dd><dt><strong>Date de réception</strong></dt><dd>${escapeHtml(declaration.receivedAt || "non renseignée")}</dd><dt><strong>Envoi</strong></dt><dd>${escapeHtml(sentAt)}</dd><dt><strong>Référence</strong></dt><dd>${reference}</dd></dl>`;
   const resend = new Resend(apiKey);
 
-  // L'accusé de réception ne part que vers un client dont la commande existe
-  // réellement dans la boutique, et une seule fois par adresse et par jour.
-  // Sans ce contrôle, n'importe qui pouvait déclencher un e-mail vers une
-  // adresse arbitraire depuis l'adresse légitime du domaine.
-  let customerReceiptAllowed = false;
-  try {
-    const order = await findOrderByReference(
-      config.public.strapiUrl,
-      declaration.orderReference.toUpperCase(),
-    );
-    customerReceiptAllowed = Boolean(order);
-  } catch {
-    customerReceiptAllowed = false;
-  }
-  if (customerReceiptAllowed) {
-    const perRecipient = consumeQuota(
-      "retractation-recipient",
-      declaration.email,
-      { limit: 1, windowMs: 24 * 60 * 60 * 1000 },
-    );
-    const globalDaily = consumeQuota("retractation-global", "all", {
-      limit: 30,
-      windowMs: 24 * 60 * 60 * 1000,
-    });
-    customerReceiptAllowed = perRecipient && globalDaily;
-  }
+  // L'accusé de réception ne part que vers le client de la commande : Strapi
+  // confirme que la référence appartient bien à l'adresse déclarée, puis les
+  // quotas destinataire et global sont réservés ensemble. Sans ce
+  // rapprochement, n'importe qui pouvait déclencher un e-mail vers une adresse
+  // arbitraire depuis l'adresse légitime du domaine.
+  const customerReceiptAllowed = await authorizeCustomerReceipt({
+    strapiUrl: config.public.strapiUrl,
+    orderReference: declaration.orderReference,
+    email: declaration.email,
+  });
 
   let sellerSent = false;
   let customerSent = false;
