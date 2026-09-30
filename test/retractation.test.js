@@ -47,13 +47,9 @@ function fakeStrapi({ match = true, verifyError = false } = {}) {
         throw Object.assign(new Error('Indisponible'), { statusCode: 503 })
       return { data: { match } }
     }
-    if (target.endsWith('/api/withdrawals/find-duplicate')) {
-      const reference = state.record?.reference
-      return reference
-        ? { data: { documentId: 'wd-1', reference, duplicate: true } }
-        : { data: null }
-    }
     if (target.endsWith('/api/withdrawals/submit')) {
+        if (state.record)
+          return { data: { documentId: 'wd-1', reference: state.record.reference, duplicate: true } }
         state.created += 1
         state.record = bodyOf(options).data
         state.record.reference = `RET-20260930-${state.created}`
