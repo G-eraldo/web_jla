@@ -47,19 +47,26 @@ function fakeStrapi({ match = true, verifyError = false } = {}) {
         throw Object.assign(new Error('Indisponible'), { statusCode: 503 })
       return { data: { match } }
     }
-    if (target.includes('/api/withdrawals')) {
-      if (options.method === 'POST') {
+    if (target.endsWith('/api/withdrawals/find-duplicate')) {
+      const reference = state.record?.reference
+      return reference
+        ? { data: { documentId: 'wd-1', reference, duplicate: true } }
+        : { data: null }
+    }
+    if (target.endsWith('/api/withdrawals/submit')) {
         state.created += 1
         state.record = bodyOf(options).data
+        state.record.reference = `RET-20260930-${state.created}`
         return { data: { documentId: 'wd-1', reference: state.record.reference } }
-      }
-      if (options.method === 'PUT') {
-        state.emailStatus.push(bodyOf(options).data)
-        return { data: { documentId: 'wd-1' } }
-      }
-      return state.record
-        ? { data: [{ documentId: 'wd-1', reference: state.record.reference }] }
-        : { data: [] }
+    }
+    if (target.includes('/api/withdrawals/') && target.endsWith('/record-email-status')) {
+        const { sellerSent, customerSent } = bodyOf(options).data
+        state.emailStatus.push({
+          emailStatus: sellerSent && customerSent ? 'sent' : sellerSent || customerSent ? 'partially_sent' : 'failed',
+          ...(sellerSent ? { sellerEmailSentAt: true } : {}),
+          ...(customerSent ? { customerReceiptSentAt: true } : {})
+        })
+        return null
     }
     throw new Error(`Appel Strapi inattendu : ${target}`)
   }

@@ -119,7 +119,6 @@ export default defineEventHandler(async (event) => {
     strapiUrl: config.public.strapiUrl,
     token: process.env.STRAPI_API_TOKEN,
     declaration,
-    declaredAt: sentAtDate,
   });
   const reference = saved.reference;
   const plainDeclaration = `Nom : ${declaration.firstName} ${declaration.lastName}\nE-mail : ${declaration.email}\nCommande : ${declaration.orderReference}\nProduits : ${declaration.products}\nDate de commande : ${declaration.orderedAt}\nDate de réception : ${declaration.receivedAt || "non renseignée"}\nDéclaration envoyée le : ${sentAt}\nRéférence : ${reference}`;
