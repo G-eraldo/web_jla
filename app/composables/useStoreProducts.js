@@ -112,40 +112,33 @@ export function useStoreProducts() {
     );
 
   const listProducts = async () => {
-    try {
-      const { find } = useStrapi();
-      const products = await fetchAllStrapiPages(({ page, pageSize }) =>
-        find("products", {
-          fields: ["name", "slug", "price", "stock", "category", "description"],
-          populate: {
-            images: { fields: ["url"] },
-            productSafety: {
-              fields: [
-                "productReference",
-                "batchNumber",
-                "mainMaterials",
-                "manufacturerBrand",
-                "manufacturerCompany",
-                "manufacturerPostalAddress",
-                "manufacturerEmail",
-                "safetyWarnings",
-              ],
-            },
+    const { find } = useStrapi();
+    const products = await fetchAllStrapiPages(({ page, pageSize }) =>
+      find("products", {
+        fields: ["name", "slug", "price", "stock", "category", "description"],
+        populate: {
+          images: { fields: ["url"] },
+          productSafety: {
+            fields: [
+              "productReference",
+              "batchNumber",
+              "mainMaterials",
+              "manufacturerBrand",
+              "manufacturerCompany",
+              "manufacturerPostalAddress",
+              "manufacturerEmail",
+              "safetyWarnings",
+            ],
           },
-          pagination: { page, pageSize },
-        }),
-      );
+        },
+        pagination: { page, pageSize },
+      }),
+    );
 
-      return products.length
-        ? products
-            .map(normalizeProduct)
-            .filter((product) => product.safety)
-        : import.meta.dev
-          ? demoCatalog()
-          : [];
-    } catch {
-      return import.meta.dev ? demoCatalog() : [];
-    }
+    if (!products.length) return import.meta.dev ? demoCatalog() : [];
+    return products
+      .map(normalizeProduct)
+      .filter((product) => product.safety);
   };
 
   return { listProducts, normalizeProduct };

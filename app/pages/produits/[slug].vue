@@ -6,6 +6,7 @@ definePageMeta({ key: route => route.params.slug })
 const route = useRoute()
 const { listProducts } = useStoreProducts()
 const { data: products, pending, error, refresh } = await useAsyncData('product-catalog', listProducts)
+if (error.value && import.meta.server) setResponseStatus(503, 'Service Unavailable')
 const product = computed(() => products.value?.find(item => item.slug === route.params.slug))
 if (!pending.value && !error.value && !product.value) throw createError({ statusCode: 404, message: 'Bijou introuvable' })
 

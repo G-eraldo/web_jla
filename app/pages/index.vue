@@ -8,6 +8,7 @@ useSeoMeta({
 })
 const { listProducts } = useStoreProducts()
 const { data: products, pending, error } = await useAsyncData('product-catalog', listProducts)
+if (error.value && import.meta.server) setResponseStatus(503, 'Service Unavailable')
 const categories = computed(() => [
   { slug: 'colliers', name: 'Colliers', note: 'Tout près du cœur' },
   { slug: 'boucles', name: 'Boucles d’oreilles', note: 'Une touche d’éclat' },
@@ -24,6 +25,7 @@ const hero = computed(() => selection.value.find(product => product.categorySlug
 
 <template>
   <div>
+    <p v-if="error" role="alert" class="border-b border-[#e8ded5] bg-[#f8f2ed] px-5 py-4 text-center text-sm text-[#776b64]">Notre catalogue est temporairement indisponible. Réessayez dans quelques instants ou écrivez-nous à contact@maisonjla.fr.</p>
     <section class="grid overflow-hidden bg-[#f2e9e2] lg:grid-cols-2">
       <div class="flex flex-col justify-center px-6 py-14 sm:px-12 sm:py-20 lg:px-20 xl:pl-28">
         <p class="text-[10px] font-medium uppercase tracking-[.24em] text-[#8a653e]">Maison JLA · Bijoux fantaisie</p>

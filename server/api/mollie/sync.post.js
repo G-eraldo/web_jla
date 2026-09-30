@@ -50,7 +50,17 @@ export default defineEventHandler(async (event) => {
     });
 
   const result = await synchronizeOrderPayment(strapiUrl, order, payment);
-  if (result.refundRequired)
-    await requestAutomaticRefund(client, strapiUrl, order, payment);
+  if (result.refundRequired) {
+    try {
+      const refund = await requestAutomaticRefund(client, strapiUrl, order, payment);
+      if (refund?.status === "failed" || refund?.status === "canceled")
+        return { status: "refund_failed" };
+      return { status: refund?.status === "refunded" ? "refunded" : "refund_pending" };
+    } catch {
+      // The refund may already have been accepted by Mollie; reconciliation
+      // checks its durable status before any retry.
+      return { status: "refund_pending" };
+    }
+  }
   return { status: result.status || "pending" };
 });

@@ -15,6 +15,7 @@ useSeoMeta({
 })
 const { listProducts } = useStoreProducts()
 const { data: products, pending, error, refresh } = await useAsyncData('product-catalog', listProducts, { default: () => [] })
+if (error.value && import.meta.server) setResponseStatus(503, 'Service Unavailable')
 useSchemaOrg([
   defineItemList({
     name: () => seo.value.title,

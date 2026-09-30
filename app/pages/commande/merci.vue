@@ -16,7 +16,7 @@ async function refreshPaymentStatus(reference) {
     paymentStatus.value = 'pending'
   }
 
-  if (paymentStatus.value === 'paid') {
+  if (['paid', 'refund_pending', 'refunded', 'refund_review', 'refund_failed'].includes(paymentStatus.value)) {
     cart.clearCart()
     return
   }
@@ -27,7 +27,7 @@ async function refreshPaymentStatus(reference) {
   }
 
   statusAttempts += 1
-  if (paymentStatus.value !== 'paid' && statusAttempts < 6) {
+  if (paymentStatus.value === 'pending' && statusAttempts < 6) {
     statusTimer = setTimeout(() => refreshPaymentStatus(reference), 2000)
   }
 }
@@ -46,6 +46,9 @@ onBeforeUnmount(() => clearTimeout(statusTimer))
     <h1 class="mt-5 font-serif text-5xl">Merci infiniment.</h1>
     <p v-if="paymentStatus === 'paid'" class="mx-auto mt-6 max-w-lg text-sm leading-6 text-[#776b64]">Votre paiement est
       confirmé. Votre e-mail de confirmation et votre facture vont vous parvenir.</p>
+    <p v-else-if="paymentStatus === 'refund_pending'" class="mx-auto mt-6 max-w-lg text-sm leading-6 text-[#776b64]">Votre paiement a été reçu, mais nous ne pouvons pas préparer cette commande. Son remboursement est en cours. Vous recevrez un e-mail de suivi dès que possible.</p>
+    <p v-else-if="paymentStatus === 'refunded'" class="mx-auto mt-6 max-w-lg text-sm leading-6 text-[#776b64]">Ce paiement a été remboursé. Le remboursement peut prendre quelques jours ouvrés pour apparaître sur votre compte. Contactez-nous si vous avez besoin d’aide.</p>
+    <p v-else-if="['refund_review', 'refund_failed'].includes(paymentStatus)" role="alert" class="mx-auto mt-6 max-w-lg text-sm leading-6 text-[#776b64]">Votre paiement nécessite une vérification. Nous faisons le nécessaire ; contactez contact@maisonjla.fr si vous n’avez pas reçu de nouvelles.</p>
     <p v-else class="mx-auto mt-6 max-w-lg text-sm leading-6 text-[#776b64]">Nous vérifions votre paiement de façon
       sécurisée.
       Vous recevrez un e-mail de confirmation dès qu’il sera validé.</p>

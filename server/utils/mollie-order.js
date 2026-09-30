@@ -1,4 +1,14 @@
-const statuses = new Set(["pending", "paid", "failed", "canceled", "expired"]);
+const statuses = new Set([
+  "pending",
+  "paid",
+  "failed",
+  "canceled",
+  "expired",
+  "refund_pending",
+  "refunded",
+  "refund_review",
+  "refund_failed",
+]);
 
 export function mollieStatus(status) {
   return statuses.has(status) ? status : "pending";
@@ -91,7 +101,10 @@ export async function synchronizeOrderPayment(strapiUrl, order, payment) {
         body: { data: {} },
       },
     );
-    return { status, refundRequired: Boolean(response?.data?.refundRequired) };
+    return {
+      status: response?.data?.status || status,
+      refundRequired: Boolean(response?.data?.refundRequired),
+    };
   }
 
   if (order.paymentStatus !== status) {
