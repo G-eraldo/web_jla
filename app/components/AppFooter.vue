@@ -65,7 +65,7 @@ import { LockKeyhole, Package, Truck } from 'lucide-vue-next';
         <NuxtLink to="/conditions-generales-de-vente" class="block py-2 text-sm hover:underline underline-offset-4">
           Conditions générales de vente
         </NuxtLink>
-        <NuxtLink to="/retractation" class="block py-2 text-sm hover:underline underline-offset-4">Renoncer au contrat
+          <NuxtLink to="/retractation" class="block py-2 text-sm hover:underline underline-offset-4">Exercer mon droit de rétractation
           ici
         </NuxtLink>
         <NuxtLink to="/politique-confidentialite" class="block py-2 text-sm hover:underline underline-offset-4">

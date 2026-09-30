@@ -88,7 +88,7 @@ useSeoMeta({
         <section>
           <h2 class="font-serif text-3xl text-[#302722]">9. Retours et rétractation</h2>
           <p class="mt-4">Les retours sont adressés à Maison JLA, Julia Touret EI, 5 Rue Joliot-Curie, 80200 Doingt. La
-            page <NuxtLink class="text-[#9b712d] underline" to="/retractation">Renoncer au contrat ici</NuxtLink> permet
+            page <NuxtLink class="text-[#9b712d] underline" to="/retractation">Exercer mon droit de rétractation</NuxtLink> permet
             d’exercer en ligne le droit de rétractation. Les modalités figurent dans les <NuxtLink
               class="text-[#9b712d] underline" to="/conditions-generales-de-vente">conditions générales de vente
             </NuxtLink>.</p>

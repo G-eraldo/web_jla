@@ -97,7 +97,7 @@ useSeoMeta({
           <h2 class="font-serif text-3xl text-[#302722]">7. Droit de rétractation et retours</h2>
           <p class="mt-4">Le client dispose de quatorze jours à compter du lendemain de la réception du produit pour
             notifier sa décision de se rétracter, sans avoir à la motiver. Il peut utiliser la page <NuxtLink
-              class="font-medium text-[#9b712d] underline underline-offset-4" to="/retractation">Renoncer au contrat ici
+              class="font-medium text-[#9b712d] underline underline-offset-4" to="/retractation">Exercer mon droit de rétractation
             </NuxtLink>, envoyer le formulaire type figurant à la fin des présentes CGV ou adresser toute déclaration
             non ambiguë à Maison JLA par e-mail ou par courrier.</p>
           <p class="mt-4">Après notification, le client renvoie les produits au plus tard dans les quatorze jours à :

@@ -1,7 +1,7 @@
 <script setup>
 definePageMeta({ layout: 'default', robots: false })
 useSeoMeta({
-  title: 'Renoncer au contrat',
+  title: 'Exercer mon droit de rétractation',
   description: 'Exercez en ligne votre droit de rétractation pour une commande Maison JLA.',
   robots: 'noindex, follow'
 })
@@ -45,7 +45,7 @@ async function confirmWithdrawal() {
   <section class="bg-[#fffaf6] px-6 py-16 sm:px-8 sm:py-24">
     <div class="mx-auto max-w-3xl">
       <p class="text-xs uppercase tracking-[.2em] text-[#9b712d]">Droit de rétractation</p>
-      <h1 class="mt-4 font-serif text-5xl text-[#302722] sm:text-6xl">Renoncer au contrat ici</h1>
+      <h1 class="mt-4 font-serif text-5xl text-[#302722] sm:text-6xl">Exercer mon droit de rétractation</h1>
       <p class="mt-6 max-w-2xl text-sm leading-7 text-[#776b64]">Ce formulaire permet de notifier en ligne votre
         rétractation. Après vérification de la commande, un accusé de réception reprenant le contenu, la date et l’heure
         de votre demande est adressé à l’e-mail utilisé lors de la commande. Si l’accusé est en attente, conservez cette

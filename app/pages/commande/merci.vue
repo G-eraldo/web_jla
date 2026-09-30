@@ -1,6 +1,6 @@
 <script setup>
 definePageMeta({ layout: 'default', robots: false })
-useSeoMeta({ title: 'Merci pour votre commande', robots: 'noindex, nofollow' })
+useSeoMeta({ title: 'Statut de votre paiement', robots: 'noindex, nofollow' })
 
 const route = useRoute()
 const cart = useCartStore()
@@ -43,7 +43,9 @@ onBeforeUnmount(() => clearTimeout(statusTimer))
 <template>
   <section class="mx-auto max-w-2xl px-6 py-28 text-center">
     <p class="text-xs uppercase tracking-widest text-[#9b712d]">Retour de paiement</p>
-    <h1 class="mt-5 font-serif text-5xl">Merci infiniment.</h1>
+    <h1 v-if="paymentStatus === 'pending'" class="mt-5 font-serif text-5xl">Nous vérifions votre paiement.</h1>
+    <h1 v-else-if="paymentStatus === 'paid'" class="mt-5 font-serif text-5xl">Merci infiniment.</h1>
+    <h1 v-else class="mt-5 font-serif text-5xl">Votre paiement nécessite un suivi.</h1>
     <p v-if="paymentStatus === 'paid'" class="mx-auto mt-6 max-w-lg text-sm leading-6 text-[#776b64]">Votre paiement est
       confirmé. Votre e-mail de confirmation et votre facture vont vous parvenir.</p>
     <p v-else-if="paymentStatus === 'refund_pending'" class="mx-auto mt-6 max-w-lg text-sm leading-6 text-[#776b64]">Votre paiement a été reçu, mais nous ne pouvons pas préparer cette commande. Son remboursement est en cours. Vous recevrez un e-mail de suivi dès que possible.</p>

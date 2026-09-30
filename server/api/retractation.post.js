@@ -11,6 +11,7 @@ import {
   recordWithdrawalEmails,
 } from "../utils/withdrawal.js";
 import { authorizeCustomerReceipt } from "../utils/withdrawal-receipt.js";
+import { withdrawalEmailHtml } from "../utils/withdrawal-email.js";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const allowedFields = new Set([
@@ -27,19 +28,6 @@ const clean = (value, maxLength) =>
   String(value || "")
     .trim()
     .slice(0, maxLength);
-const escapeHtml = (value) =>
-  clean(value, 2000).replace(
-    /[&<>"']/g,
-    (character) =>
-      ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;",
-      })[character],
-  );
-
 const withdrawalDate = (date) =>
   new Intl.DateTimeFormat("fr-FR", {
     dateStyle: "long",
@@ -122,7 +110,7 @@ export default defineEventHandler(async (event) => {
   });
   const reference = saved.reference;
   const plainDeclaration = `Nom : ${declaration.firstName} ${declaration.lastName}\nE-mail : ${declaration.email}\nCommande : ${declaration.orderReference}\nProduits : ${declaration.products}\nDate de commande : ${declaration.orderedAt}\nDate de réception : ${declaration.receivedAt || "non renseignée"}\nDéclaration envoyée le : ${sentAt}\nRéférence : ${reference}`;
-  const htmlDeclaration = `<dl><dt><strong>Nom</strong></dt><dd>${escapeHtml(declaration.firstName)} ${escapeHtml(declaration.lastName)}</dd><dt><strong>E-mail</strong></dt><dd>${escapeHtml(declaration.email)}</dd><dt><strong>Commande</strong></dt><dd>${escapeHtml(declaration.orderReference)}</dd><dt><strong>Produit ou produits</strong></dt><dd>${escapeHtml(declaration.products).replaceAll("\n", "<br>")}</dd><dt><strong>Date de commande</strong></dt><dd>${escapeHtml(declaration.orderedAt)}</dd><dt><strong>Date de réception</strong></dt><dd>${escapeHtml(declaration.receivedAt || "non renseignée")}</dd><dt><strong>Envoi</strong></dt><dd>${escapeHtml(sentAt)}</dd><dt><strong>Référence</strong></dt><dd>${reference}</dd></dl>`;
+  const emailDeclaration = { ...declaration, sentAt, reference };
   const resend = new Resend(apiKey);
 
   // L'accusé de réception ne part que vers le client de la commande : Strapi
@@ -148,7 +136,12 @@ export default defineEventHandler(async (event) => {
         replyTo: declaration.email,
         subject: `Rétractation ${declaration.orderReference} — ${reference}`,
         text: `Une déclaration de rétractation a été reçue.\n\n${plainDeclaration}`,
-        html: `<h1>Déclaration de rétractation reçue</h1>${htmlDeclaration}`,
+        html: withdrawalEmailHtml({
+          title: 'Déclaration de rétractation reçue',
+          intro: 'Une déclaration de rétractation a été reçue.',
+          declaration: emailDeclaration,
+          closing: 'Retrouvez la demande dans votre espace Maison JLA.'
+        }),
       });
       sellerSent = true;
     }
@@ -163,7 +156,12 @@ export default defineEventHandler(async (event) => {
         replyTo: sellerEmail,
         subject: `Accusé de réception de votre rétractation — Maison JLA`,
         text: `Votre déclaration de rétractation a été transmise à Maison JLA.\n\n${plainDeclaration}\n\nConservez cet e-mail. Maison JLA vous indiquera les modalités de retour.`,
-        html: `<h1>Votre rétractation a bien été transmise</h1><p>Conservez cet accusé de réception sur support durable.</p>${htmlDeclaration}<p>Maison JLA vous indiquera les modalités de retour.</p>`,
+        html: withdrawalEmailHtml({
+          title: 'Votre rétractation a bien été transmise',
+          intro: 'Conservez cet accusé de réception sur support durable.',
+          declaration: emailDeclaration,
+          closing: 'Maison JLA vous indiquera les modalités de retour.'
+        }),
       });
       customerSent = true;
       // Envoi accepté : la réservation devient définitive.

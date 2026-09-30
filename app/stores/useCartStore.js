@@ -109,11 +109,13 @@ export const useCartStore = defineStore("cart", {
       );
       this.items = this.items.flatMap((item) => {
         const product = catalog.get(item.id);
-        if (!product || product.stock < 1) return [];
+        if (!product) return [];
         return [
           {
             ...product,
-            quantity: Math.min(Number(item.quantity) || 1, product.stock, 10),
+            // Le paiement en cours réserve le stock et peut le faire passer à 0.
+            // Garder l'article jusqu'au statut définitif de cette commande.
+            quantity: Math.min(Number(item.quantity) || 1, product.stock > 0 ? product.stock : 10, 10),
           },
         ];
       });

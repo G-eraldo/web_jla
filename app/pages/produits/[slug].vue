@@ -106,7 +106,7 @@ useSchemaOrg([
           </div>
           <h1 class="mt-5 font-serif text-4xl leading-[1.04] tracking-[-.02em] text-[#302722] sm:text-5xl xl:text-[3.5rem]">{{ product.name }}</h1>
           <p class="mt-4 text-lg text-[#514137]">{{ money(product.price) }}</p>
-          <p class="mt-3 text-xs leading-6 text-[#776b64]">Garantie légale de conformité de deux ans et garantie des vices cachés. Aucune garantie commerciale n’est proposée. Vous disposez de 14 jours à compter du lendemain de la réception pour vous rétracter, sans motif ; les frais de retour sont à votre charge. <NuxtLink class="underline underline-offset-4" to="/retractation">Renoncer au contrat ici</NuxtLink>.</p>
+          <p class="mt-3 text-xs leading-6 text-[#776b64]">Garantie légale de conformité de deux ans et garantie des vices cachés. Aucune garantie commerciale n’est proposée. Vous disposez de 14 jours à compter du lendemain de la réception pour vous rétracter, sans motif ; les frais de retour sont à votre charge. <NuxtLink class="underline underline-offset-4" to="/retractation">Exercer mon droit de rétractation</NuxtLink>.</p>
           <p class="mt-7 whitespace-pre-line text-sm leading-7 text-[#776b64]">{{ product.description }}</p>
           <aside v-if="product.safety" class="mt-6 border border-[#e9ddd3] bg-[#fffaf6] p-4 text-xs leading-6 text-[#776b64]">
             <p class="font-medium uppercase tracking-[.14em] text-[#302722]">Sécurité et fabricant</p>
