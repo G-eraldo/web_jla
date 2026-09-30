@@ -4,7 +4,7 @@
 
 - [ ] Créer dans Strapi un jeton API **restreint** aux permissions `find`, `findOne`, `create` et `update` de `Commande`, puis le placer uniquement dans `web/.env` sous `STRAPI_API_TOKEN`.
 - [ ] Configurer une clé Mollie de test, puis une clé live, dans `MOLLIE_API_KEY`.
-- [ ] Vérifier que `NUXT_PUBLIC_SITE_URL` correspond exactement au domaine HTTPS de production. C’est l’URL appelée par le webhook Mollie.
+- [ ] Dans l’environnement Dokploy du frontend, définir `NUXT_PUBLIC_SITE_URL=https://maisonjla.fr`. C’est l’URL canonique et celle utilisée pour le webhook Mollie.
 - [ ] Effectuer un paiement test et vérifier : commande créée `pending` → paiement `paid` → e-mail de confirmation reçu une seule fois.
 - [ ] Configurer les mêmes `SENDCLOUD_PUBLIC_KEY` et `SENDCLOUD_SECRET_KEY` côté Nuxt et Strapi, puis renseigner `SENDCLOUD_INTEGRATION_ID` côté Strapi avec l’identifiant de l’intégration « maisonJLa ».
 - [ ] Après un paiement test, vérifier que la commande payée apparaît une seule fois dans Sendcloud, onglet **Commande(s) importée(s)**, avec l’adresse, les articles et le point relais éventuel.
