@@ -3,6 +3,8 @@ import { fetchAllStrapiPages } from '../../../app/lib/strapi-pagination.js'
 export default defineSitemapEventHandler(async () => {
   const config = useRuntimeConfig()
   const strapiUrl = String(config.public.strapiUrl || '').replace(/\/$/, '')
+  const mediaPublicUrl = String(config.public.mediaPublicUrl || '').replace(/\/$/, '')
+  const oldR2PublicOrigin = 'https://pub-559ed8ce04b047dd87b8709734cbe613.r2.dev'
   const collections = ['tous-les-bijoux', 'colliers', 'boucles', 'bracelets', 'bagues']
   const urls = collections.map(slug => ({
     loc: `/collections/${slug}`,
@@ -25,12 +27,17 @@ export default defineSitemapEventHandler(async () => {
     for (const product of products) {
       if (!product.slug) continue
       const image = product.images?.[0]?.url
+      const imageUrl = image?.startsWith('/')
+        ? `${strapiUrl}${image}`
+        : mediaPublicUrl && image?.startsWith(`${oldR2PublicOrigin}/`)
+          ? `${mediaPublicUrl}${image.slice(oldR2PublicOrigin.length)}`
+          : image
       urls.push({
         loc: `/produits/${product.slug}`,
         lastmod: product.updatedAt,
         changefreq: 'weekly',
         priority: 0.8,
-        ...(image ? { images: [{ loc: image.startsWith('/') ? `${strapiUrl}${image}` : image }] } : {})
+        ...(imageUrl ? { images: [{ loc: imageUrl }] } : {})
       })
     }
   } catch {

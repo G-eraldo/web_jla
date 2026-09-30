@@ -53,9 +53,15 @@ export function useStoreProducts() {
     const sources = imageSources.length
       ? imageSources
       : [product.image || demoProducts[0].image];
-    const images = sources.map((source) =>
-      source.startsWith("/") ? `${config.public.strapiUrl}${source}` : source,
-    );
+    const oldR2PublicOrigin = "https://pub-559ed8ce04b047dd87b8709734cbe613.r2.dev";
+    const mediaPublicOrigin = String(config.public.mediaPublicUrl || "").replace(/\/$/, "");
+    const images = sources.map((source) => {
+      if (source.startsWith("/")) return `${config.public.strapiUrl}${source}`;
+      if (mediaPublicOrigin && source.startsWith(`${oldR2PublicOrigin}/`)) {
+        return `${mediaPublicOrigin}${source.slice(oldR2PublicOrigin.length)}`;
+      }
+      return source;
+    });
     const stock = Number(product.stock);
     const safety = product.productSafety || {};
     const hasSafetyInformation = [

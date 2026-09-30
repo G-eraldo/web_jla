@@ -60,7 +60,8 @@ export default defineNuxtConfig({
     resendFrom: process.env.RESEND_FROM,
     public: {
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-      strapiUrl: process.env.STRAPI_URL || 'http://localhost:1337'
+      strapiUrl: process.env.STRAPI_URL || 'http://localhost:1337',
+      mediaPublicUrl: process.env.NUXT_PUBLIC_MEDIA_PUBLIC_URL || 'https://images.maisonjla.fr'
     }
   },
   // Les sources des builds ne doivent pas être publiables : les sourcemaps
