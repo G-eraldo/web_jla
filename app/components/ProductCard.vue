@@ -7,9 +7,9 @@ const money = value => new Intl.NumberFormat('fr-FR', { style: 'currency', curre
   <NuxtLink :to="`/produits/${product.slug}`"
     class="group block min-w-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#947756]">
     <div class="relative overflow-hidden bg-[#f0e8e0]">
-      <img :src="product.image" :alt="product.name" loading="lazy" decoding="async" width="640" height="800"
+      <NuxtImg :src="product.image" format="webp" :alt="product.name" loading="lazy" decoding="async" width="640" height="800" sizes="50vw md:33vw lg:25vw xl:300px" densities="1x 2x"
         class="aspect-[4/5] w-full object-cover transition-transform duration-500 motion-safe:group-hover:scale-[1.035]"
-        :class="{ 'opacity-65': product.stock < 1 }">
+        :class="{ 'opacity-65': product.stock < 1 }" />
       <span v-if="product.stock < 1"
         class="absolute left-2 top-2 bg-[#fffaf5]/95 px-2.5 py-2 text-[9px] uppercase tracking-widest text-[#78695f] sm:left-3 sm:top-3">Épuisé</span>
       <span aria-hidden="true"

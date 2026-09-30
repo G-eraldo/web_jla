@@ -1,39 +1,36 @@
 <script setup>
-import { collectionSeo, COLLECTION_SEO } from '~/lib/seo'
+import { collectionPage, collectionSeo, COLLECTION_SEO } from '~/lib/seo'
 
-definePageMeta({ layout: 'default' })
+definePageMeta({ layout: 'default', key: route => route.path })
 const route = useRoute()
+const router = useRouter()
+const config = useRuntimeConfig()
 const labels = Object.fromEntries(Object.entries(COLLECTION_SEO).map(([slug, item]) => [slug, item.title]))
 const seo = computed(() => collectionSeo(route.params.slug))
 if (!seo.value) throw createError({ statusCode: 404, message: 'Collection introuvable' })
 const title = computed(() => seo.value.title)
-useSeoMeta({
-  title: () => seo.value.title,
-  description: () => seo.value.description,
-  ogTitle: () => seo.value.title,
-  ogDescription: () => seo.value.description
-})
 const { listProducts } = useStoreProducts()
 const { data: products, pending, error, refresh } = await useAsyncData('product-catalog', listProducts, { default: () => [] })
 if (error.value && import.meta.server) setResponseStatus(503, 'Service Unavailable')
-useSchemaOrg([
-  defineItemList({
-    name: () => seo.value.title,
-    itemListElement: () => (products.value || [])
-      .filter(product => route.params.slug === 'tous-les-bijoux' || product.categorySlug === route.params.slug)
-      .slice(0, 12)
-      .map((product, index) => ({
-        '@type': 'ListItem',
-        position: index + 1,
-        name: product.name,
-        url: `/produits/${product.slug}`
-      }))
-  })
-])
-const search = ref('')
-const sort = ref('selection')
-const availableOnly = ref(false)
-const page = ref(1)
+const queryText = value => typeof value === 'string' ? value : ''
+function updateFilters(changes) {
+  const query = { ...route.query, ...changes }
+  delete query.page
+  return router.replace({ path: route.path, query })
+}
+const search = computed({
+  get: () => queryText(route.query.q),
+  set: value => updateFilters({ q: value || undefined })
+})
+const sort = computed({
+  get: () => ['price-asc', 'price-desc', 'name'].includes(route.query.sort) ? route.query.sort : 'selection',
+  set: value => updateFilters({ sort: value === 'selection' ? undefined : value })
+})
+const availableOnly = computed({
+  get: () => route.query.stock === '1',
+  set: value => updateFilters({ stock: value ? '1' : undefined })
+})
+const requestedPage = computed(() => collectionPage(route.query.page))
 const pageSize = 12
 const normalize = value => String(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
 const filteredProducts = computed(() => {
@@ -49,14 +46,48 @@ const filteredProducts = computed(() => {
   return result
 })
 const pageCount = computed(() => Math.max(1, Math.ceil(filteredProducts.value.length / pageSize)))
+const page = computed(() => Math.min(requestedPage.value || 1, pageCount.value))
 const visibleProducts = computed(() => filteredProducts.value.slice((page.value - 1) * pageSize, page.value * pageSize))
-watch([search, sort, availableOnly, () => route.params.slug], () => { page.value = 1 })
-watch(pageCount, count => { page.value = Math.min(page.value, count) })
-function resetFilters() { search.value = ''; availableOnly.value = false; sort.value = 'selection' }
-function changePage(nextPage) {
-  page.value = nextPage
-  document.getElementById('catalogue-results')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+if (!requestedPage.value || (!error.value && !pending.value && requestedPage.value > pageCount.value)) {
+  throw createError({ statusCode: 404, message: 'Page de collection introuvable' })
 }
+function pageLocation(nextPage) {
+  const query = { ...route.query }
+  if (nextPage === 1) delete query.page
+  else query.page = String(nextPage)
+  return { path: route.path, query, hash: '#catalogue-results' }
+}
+function resetFilters() { return updateFilters({ q: undefined, sort: undefined, stock: undefined }) }
+const filtered = computed(() => Boolean(search.value || availableOnly.value || sort.value !== 'selection'))
+const pageTitle = computed(() => `${title.value}${page.value > 1 ? ` — Page ${page.value}` : ''}`)
+const canonical = computed(() => {
+  const url = new URL(route.path, config.public.siteUrl)
+  if (page.value > 1) url.searchParams.set('page', String(page.value))
+  if (search.value) url.searchParams.set('q', search.value)
+  if (sort.value !== 'selection') url.searchParams.set('sort', sort.value)
+  if (availableOnly.value) url.searchParams.set('stock', '1')
+  return url.href
+})
+useHead(() => ({ link: [{ rel: 'canonical', href: canonical.value }] }))
+useSeoMeta({
+  title: () => pageTitle.value,
+  description: () => seo.value.description,
+  ogTitle: () => pageTitle.value,
+  ogDescription: () => seo.value.description,
+  ogUrl: () => canonical.value,
+  robots: () => filtered.value ? 'noindex, follow' : 'index, follow'
+})
+useSchemaOrg([
+  defineItemList({
+    name: () => pageTitle.value,
+    itemListElement: () => visibleProducts.value.map((product, index) => ({
+      '@type': 'ListItem',
+      position: (page.value - 1) * pageSize + index + 1,
+      name: product.name,
+      url: `/produits/${product.slug}`
+    }))
+  })
+])
 </script>
 
 <template>
@@ -89,7 +120,13 @@ function changePage(nextPage) {
         <div v-else-if="visibleProducts.length" class="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-10 md:grid-cols-3 lg:grid-cols-4"><ProductCard v-for="product in visibleProducts" :key="product.id" :product="product" /></div>
         <div v-else class="bg-[#f6eee9] px-6 py-14 text-center"><h2 class="font-serif text-2xl">Aucun bijou pour cette recherche</h2><p class="mt-3 text-sm leading-6 text-[#78695f]">Essayez un autre nom ou découvrez le reste de notre collection.</p><button v-if="search || availableOnly" type="button" class="mt-6 bg-[#382b25] px-6 py-3 text-xs text-white" @click="resetFilters">Effacer les filtres</button><NuxtLink v-else to="/collections/tous-les-bijoux" class="mt-6 inline-block bg-[#382b25] px-6 py-3 text-xs text-white">Voir tous les bijoux</NuxtLink></div>
       </div>
-      <nav v-if="pageCount > 1" aria-label="Pagination des bijoux" class="mt-12 flex items-center justify-center gap-3 border-t border-[#e8ded5] pt-8"><button type="button" :disabled="page === 1" class="min-h-11 border border-[#e8ded5] px-4 text-xs transition-colors hover:border-[#947756] disabled:cursor-not-allowed disabled:opacity-35" @click="changePage(page - 1)">Précédent</button><span class="px-2 text-xs text-[#78695f]">{{ page }} / {{ pageCount }}</span><button type="button" :disabled="page === pageCount" class="min-h-11 border border-[#e8ded5] px-4 text-xs transition-colors hover:border-[#947756] disabled:cursor-not-allowed disabled:opacity-35" @click="changePage(page + 1)">Suivant</button></nav>
+      <nav v-if="pageCount > 1" aria-label="Pagination des bijoux" class="mt-12 flex items-center justify-center gap-3 border-t border-[#e8ded5] pt-8">
+        <NuxtLink v-if="page > 1" :to="pageLocation(page - 1)" rel="prev" class="inline-flex min-h-11 items-center border border-[#e8ded5] px-4 text-xs transition-colors hover:border-[#947756]">Précédent</NuxtLink>
+        <span v-else aria-disabled="true" class="inline-flex min-h-11 items-center border border-[#e8ded5] px-4 text-xs opacity-35">Précédent</span>
+        <span class="px-2 text-xs text-[#78695f]" aria-current="page">{{ page }} / {{ pageCount }}</span>
+        <NuxtLink v-if="page < pageCount" :to="pageLocation(page + 1)" rel="next" class="inline-flex min-h-11 items-center border border-[#e8ded5] px-4 text-xs transition-colors hover:border-[#947756]">Suivant</NuxtLink>
+        <span v-else aria-disabled="true" class="inline-flex min-h-11 items-center border border-[#e8ded5] px-4 text-xs opacity-35">Suivant</span>
+      </nav>
     </section>
   </div>
 </template>

@@ -100,8 +100,8 @@ watch(() => route.fullPath, () => {
               @click="closeCart">Découvrir les bijoux</NuxtLink>
           </div>
           <div v-for="item in cart.items" :key="item.id" class="flex gap-4 border-b border-[#e9ddd3] py-5 first:pt-0">
-            <img v-if="item.image" :src="item.image" :alt="item.name"
-              class="h-24 w-20 shrink-0 bg-[#f6e7e6] object-cover">
+            <NuxtImg v-if="item.image" :src="item.image" format="webp" :alt="item.name" width="80" height="96" densities="1x 2x"
+              class="h-24 w-20 shrink-0 bg-[#f6e7e6] object-cover" />
             <div class="min-w-0 flex-1">
               <p class="font-serif text-lg leading-snug">{{ item.name }}</p>
               <p class="mt-2 text-xs text-[#776b64]">Quantité : {{ item.quantity }}</p>

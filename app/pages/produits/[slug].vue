@@ -1,5 +1,6 @@
 <script setup>
 import { Check, ChevronDown, PackageCheck, ShieldCheck, ShoppingBag } from 'lucide-vue-next'
+import { productSeoDescription } from '~/lib/seo'
 
 definePageMeta({ key: route => route.params.slug })
 
@@ -30,13 +31,9 @@ function addToCart() {
 watch(() => route.params.slug, () => { added.value = false; announcement.value = ''; selectedImage.value = 0 })
 useSeoMeta({
   title: () => product.value?.name || 'Bijou Maison JLA',
-  description: () => {
-    const text = product.value?.description || 'Bijou fantaisie Maison JLA.'
-    const price = product.value ? new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(product.value.price) : ''
-    return `${text.slice(0, 120)}${price ? ` ${price}.` : ''} Livraison en France métropolitaine.`.slice(0, 160)
-  },
+  description: () => productSeoDescription(product.value),
   ogTitle: () => product.value?.name || 'Bijou Maison JLA',
-  ogDescription: () => product.value?.description?.slice(0, 160),
+  ogDescription: () => productSeoDescription(product.value),
   ogImage: () => product.value?.image,
   ogType: 'website'
 })
@@ -91,11 +88,11 @@ useSchemaOrg([
         <div class="grid gap-3 sm:gap-4" :class="{ 'sm:grid-cols-[72px_minmax(0,1fr)]': gallery.length > 1 }">
           <div v-if="gallery.length > 1" class="order-2 flex gap-3 overflow-x-auto sm:order-1 sm:flex-col">
             <button v-for="(image, index) in gallery" :key="image" type="button" class="shrink-0 border bg-[#f0e8e0] transition" :class="selectedImage === index ? 'border-[#302722]' : 'border-transparent opacity-65 hover:opacity-100'" :aria-label="`Afficher la vue ${index + 1} de ${product.name}`" :aria-pressed="selectedImage === index" @click="selectedImage = index">
-              <img :src="image" alt="" width="72" height="90" class="h-[90px] w-[72px] object-cover">
+              <NuxtImg :src="image" format="webp" alt="" width="72" height="90" densities="1x 2x" loading="lazy" class="h-[90px] w-[72px] object-cover" />
             </button>
           </div>
           <div class="relative order-1 overflow-hidden bg-[#f0e8e0] sm:order-2">
-            <img :src="gallery[selectedImage]" :alt="product.name" width="900" height="1125" fetchpriority="high" class="aspect-[4/5] w-full object-cover" :class="{ 'opacity-65': product.stock < 1 }">
+            <NuxtImg :src="gallery[selectedImage]" format="webp" :alt="product.name" width="900" height="1125" sizes="100vw sm:80vw lg:50vw xl:700px" densities="1x 2x" fetchpriority="high" class="aspect-[4/5] w-full object-cover" :class="{ 'opacity-65': product.stock < 1 }" />
             <span class="absolute left-4 top-4 bg-[#fffaf6]/90 px-3 py-2 text-[9px] uppercase tracking-[.18em] backdrop-blur-sm">Maison JLA</span>
           </div>
         </div>

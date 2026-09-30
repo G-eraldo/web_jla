@@ -1,4 +1,8 @@
+import { randomBytes } from 'node:crypto';
+
 export default defineEventHandler((event) => {
+  // Une valeur imprévisible par réponse, partagée uniquement avec le rendu SSR.
+  const nonce = event.context.cspNonce ||= randomBytes(24).toString('base64');
   const strapiUrl = String(useRuntimeConfig().public.strapiUrl || "").replace(
     /\/$/,
     "",
@@ -19,7 +23,8 @@ export default defineEventHandler((event) => {
     `img-src ${imageSrc}`,
     "font-src 'self'",
     "style-src 'self' 'unsafe-inline'",
-    "script-src 'self' 'unsafe-inline'",
+    `script-src 'self' 'nonce-${nonce}'`,
+    "script-src-attr 'none'",
     `connect-src ${connectSrc}`,
     "upgrade-insecure-requests",
   ].join("; ");

@@ -31,3 +31,26 @@ export const COLLECTION_SLUGS = Object.keys(COLLECTION_SEO)
 export function collectionSeo(slug) {
   return COLLECTION_SEO[slug] || null
 }
+
+export function collectionPage(value) {
+  if (value === undefined) return 1
+  if (typeof value !== 'string' || !/^[1-9]\d*$/.test(value)) return null
+  const page = Number(value)
+  return Number.isSafeInteger(page) ? page : null
+}
+
+export function productSeoDescription(product) {
+  if (!product) return 'Découvrez les bijoux fantaisie Maison JLA.'
+  const name = String(product.name || 'Bijou Maison JLA').trim()
+  const description = String(product.description || '').replace(/\s+/g, ' ').trim()
+  const price = Number.isFinite(product.price)
+    ? `${new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(product.price)}. `
+    : ''
+  const prefix = `${name} — `
+  const suffix = ` ${price}Livraison en France métropolitaine.`
+  const available = Math.max(0, 160 - prefix.length - suffix.length)
+  const detail = description.length > available
+    ? `${description.slice(0, Math.max(0, available - 1)).trimEnd()}…`
+    : description
+  return `${prefix}${detail}${suffix}`.slice(0, 160)
+}

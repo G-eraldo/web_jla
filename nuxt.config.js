@@ -6,6 +6,7 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
     '@nuxtjs/seo',
+    '@nuxt/image',
     'shadcn-nuxt'
   ],
   css: ['~/assets/css/main.css'],
@@ -29,7 +30,21 @@ export default defineNuxtConfig({
     }
   },
   robots: {
-    disallow: ['/checkout', '/commande', '/retractation']
+    // Google doit pouvoir lire les balises noindex de ces pages.
+    disallowNonIndexableRoutes: false
+  },
+  image: {
+    provider: 'ipx',
+    domains: ['images.maisonjla.fr'],
+    quality: 80,
+    ipx: {
+      maxAge: 86400,
+      http: {
+        fetchOptions: {
+          headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MaisonJLA-Image/1.0)' }
+        }
+      }
+    }
   },
   sitemap: {
     exclude: ['/checkout', '/commande/**', '/retractation'],

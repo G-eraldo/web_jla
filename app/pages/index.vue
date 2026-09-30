@@ -39,8 +39,8 @@ const hero = computed(() => selection.value.find(product => product.categorySlug
         <p class="mt-7 text-xs text-[#776b64]">Colliers, bracelets, bagues & boucles d’oreilles</p>
       </div>
       <div class="relative min-h-80 bg-[#e6d7c7] sm:min-h-[460px] lg:min-h-[590px]">
-        <img v-if="hero" :src="hero.image" :alt="hero.name" fetchpriority="high"
-          class="absolute inset-0 h-full w-full object-cover object-center">
+        <NuxtImg v-if="hero" :src="hero.image" format="webp" :alt="hero.name" width="1200" height="1500" sizes="100vw lg:50vw" densities="1x 2x" fetchpriority="high"
+          class="absolute inset-0 h-full w-full object-cover object-center" />
         <NuxtLink v-if="hero" :to="`/produits/${hero.slug}`"
           class="absolute bottom-5 left-5 right-5 flex items-center justify-between gap-4 bg-[#fffaf6]/95 px-5 py-4 text-sm sm:bottom-8 sm:left-8 sm:right-8">
           <span><span class="mb-1 block text-[9px] uppercase tracking-[.18em] text-[#887971]">Sous les
@@ -63,9 +63,9 @@ const hero = computed(() => selection.value.find(product => product.categorySlug
       <div class="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
         <NuxtLink v-for="category in categories" :key="category.slug" :to="`/collections/${category.slug}`"
           class="group">
-          <div class="aspect-[4/5] overflow-hidden rounded-t-full bg-[#f2e9e2]"><img v-if="category.image"
-              :src="category.image" :alt="category.name" loading="lazy"
-              class="h-full w-full object-cover transition duration-500 motion-safe:group-hover:scale-105"></div>
+          <div class="aspect-[4/5] overflow-hidden rounded-t-full bg-[#f2e9e2]"><NuxtImg v-if="category.image"
+              :src="category.image" format="webp" :alt="category.name" width="640" height="800" sizes="50vw lg:25vw xl:300px" densities="1x 2x" loading="lazy"
+              class="h-full w-full object-cover transition duration-500 motion-safe:group-hover:scale-105" /></div>
           <div class="mt-4 text-center">
             <h3 class="font-serif text-xl sm:text-2xl">{{ category.name }}</h3>
             <p class="mt-1 text-xs text-[#776b64]">{{ category.note }}</p>
