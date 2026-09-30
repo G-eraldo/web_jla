@@ -1,17 +1,17 @@
-import { Resend } from "resend";
 import { randomUUID } from "node:crypto";
+import { Resend } from "resend";
 import {
   enforceRateLimit,
   enforceSameOrigin,
   readLimitedJsonBody,
   sendResendEmail,
 } from "../utils/request-security.js";
+import { withdrawalEmailHtml } from "../utils/withdrawal-email.js";
+import { authorizeCustomerReceipt } from "../utils/withdrawal-receipt.js";
 import {
   persistWithdrawal,
   recordWithdrawalEmails,
 } from "../utils/withdrawal.js";
-import { authorizeCustomerReceipt } from "../utils/withdrawal-receipt.js";
-import { withdrawalEmailHtml } from "../utils/withdrawal-email.js";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const allowedFields = new Set([
@@ -137,10 +137,10 @@ export default defineEventHandler(async (event) => {
         subject: `Rétractation ${declaration.orderReference} — ${reference}`,
         text: `Une déclaration de rétractation a été reçue.\n\n${plainDeclaration}`,
         html: withdrawalEmailHtml({
-          title: 'Déclaration de rétractation reçue',
-          intro: 'Une déclaration de rétractation a été reçue.',
+          title: "Déclaration de rétractation reçue",
+          intro: "Une déclaration de rétractation a été reçue.",
           declaration: emailDeclaration,
-          closing: 'Retrouvez la demande dans votre espace Maison JLA.'
+          closing: "Retrouvez la demande dans votre espace Maison JLA.",
         }),
       });
       sellerSent = true;
@@ -155,12 +155,14 @@ export default defineEventHandler(async (event) => {
         to: declaration.email,
         replyTo: sellerEmail,
         subject: `Accusé de réception de votre rétractation — Maison JLA`,
-        text: `Votre déclaration de rétractation a été transmise à Maison JLA.\n\n${plainDeclaration}\n\nConservez cet e-mail. Maison JLA vous indiquera les modalités de retour.`,
+        text: `Votre déclaration de rétractation a été transmise à Maison JLA.\n\n${plainDeclaration}\n\nModalités de retour : renvoyez les articles au plus tard dans les quatorze jours suivant votre déclaration à Maison JLA — Julia Touret EI, 5 Rue Joliot-Curie, 80200 Doingt, France. Les frais directs de retour sont à votre charge. Conservez une preuve d'expédition. Le remboursement comprend les sommes versées, dont les frais de livraison standard ; il peut être différé jusqu'à la réception des articles ou de la preuve de leur expédition.\n\nConservez cet e-mail. Pour toute question, répondez à ce message.`,
         html: withdrawalEmailHtml({
-          title: 'Votre rétractation a bien été transmise',
-          intro: 'Conservez cet accusé de réception sur support durable.',
+          title: "Votre rétractation a bien été transmise",
+          intro: "Conservez cet accusé de réception sur support durable.",
           declaration: emailDeclaration,
-          closing: 'Maison JLA vous indiquera les modalités de retour.'
+          closing:
+            "Conservez cet e-mail. Pour toute question, répondez à ce message.",
+          returnInstructions: true,
         }),
       });
       customerSent = true;
@@ -174,17 +176,17 @@ export default defineEventHandler(async (event) => {
       customerReservation.release();
     }
   }
-    try {
-      await recordWithdrawalEmails({
-        strapiUrl: config.public.strapiUrl,
-        token: process.env.STRAPI_API_TOKEN,
-        documentId: saved.documentId,
-        sellerSent,
-        customerSent,
-      });
-    } catch {
-      // The declaration remains stored; an administrator can safely resend it.
-    }
+  try {
+    await recordWithdrawalEmails({
+      strapiUrl: config.public.strapiUrl,
+      token: process.env.STRAPI_API_TOKEN,
+      documentId: saved.documentId,
+      sellerSent,
+      customerSent,
+    });
+  } catch {
+    // The declaration remains stored; an administrator can safely resend it.
+  }
 
   if (!customerSent) {
     return { reference, sentAt, receiptPending: true };

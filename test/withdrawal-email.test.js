@@ -6,7 +6,8 @@ test('l’accusé de rétractation reprend le style Maison JLA et échappe les d
   const html = withdrawalEmailHtml({
     title: 'Votre rétractation a bien été transmise',
     intro: 'Conservez cet accusé.',
-    closing: 'Maison JLA vous indiquera les modalités de retour.',
+    closing: 'Pour toute question, répondez à ce message.',
+    returnInstructions: true,
     declaration: {
       firstName: '<Claire>', lastName: 'Dupont', email: 'claire@example.fr',
       orderReference: 'JLA-123', products: 'Collier', orderedAt: '2026-09-30',
@@ -19,4 +20,7 @@ test('l’accusé de rétractation reprend le style Maison JLA et échappe les d
   assert.match(html, /&lt;Claire&gt;/)
   assert.doesNotMatch(html, /<Claire>/)
   assert.match(html, /RET-123/)
+  assert.match(html, /5 Rue Joliot-Curie/)
+  assert.match(html, /quatorze jours/)
+  assert.match(html, /frais directs de retour/)
 })
