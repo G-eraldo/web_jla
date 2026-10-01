@@ -33,10 +33,28 @@ export function enforceRequestSize(event, maxBytes) {
   }
 }
 
-export async function readLimitedJsonBody(event, maxBytes) {
+export async function readLimitedRawBody(event, maxBytes) {
   enforceRequestSize(event, maxBytes);
+  const request = event.node?.req;
+  // En production Node, contrôler chaque fragment avant de le conserver.
+  // Ne pas détruire la socket : H3 doit encore pouvoir envoyer le statut 413.
+  if (request?.iterator && !request.readableEnded) {
+    const chunks = [];
+    let size = 0;
+    for await (const chunk of request.iterator({ destroyOnReturn: false })) {
+      const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+      size += buffer.length;
+      if (size > maxBytes) {
+        request.pause();
+        setResponseHeader(event, "Connection", "close");
+        throw createError({ statusCode: 413, message: "La requête est trop volumineuse." });
+      }
+      chunks.push(buffer);
+    }
+    return Buffer.concat(chunks, size);
+  }
   const raw = await readRawBody(event, false);
-  if (raw == null) return {};
+  if (raw == null) return Buffer.alloc(0);
   const size = Buffer.isBuffer(raw)
     ? raw.length
     : Buffer.byteLength(String(raw));
@@ -46,7 +64,12 @@ export async function readLimitedJsonBody(event, maxBytes) {
       message: "La requête est trop volumineuse.",
     });
   }
-  if (size === 0) return {};
+  return Buffer.isBuffer(raw) ? raw : Buffer.from(String(raw));
+}
+
+export async function readLimitedJsonBody(event, maxBytes) {
+  const raw = await readLimitedRawBody(event, maxBytes);
+  if (raw.length === 0) return {};
   try {
     const parsed = JSON.parse(
       Buffer.isBuffer(raw) ? raw.toString("utf8") : String(raw),

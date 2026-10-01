@@ -10,7 +10,7 @@ import {
 import { requestAutomaticRefund } from "../../utils/mollie-refund.js";
 import {
   enforceRateLimit,
-  enforceRequestSize,
+  readLimitedRawBody,
 } from "../../utils/request-security.js";
 
 export default defineEventHandler(async (event) => {
@@ -19,19 +19,7 @@ export default defineEventHandler(async (event) => {
     limit: 120,
     windowMs: 60 * 1000,
   });
-  enforceRequestSize(event, 8 * 1024);
-  const raw = await readRawBody(event, false);
-  const size =
-    raw == null
-      ? 0
-      : Buffer.isBuffer(raw)
-        ? raw.length
-        : Buffer.byteLength(String(raw));
-  if (size > 8 * 1024)
-    throw createError({
-      statusCode: 413,
-      message: "La requête est trop volumineuse.",
-    });
+  const raw = await readLimitedRawBody(event, 8 * 1024);
   const text =
     raw == null
       ? ""

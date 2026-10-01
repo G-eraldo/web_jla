@@ -58,6 +58,9 @@ useSchemaOrg([
       ? defineOffer({
           price: product.value.price,
           priceCurrency: 'EUR',
+          // Aucun terme commercial ne fixe une date d'expiration du prix.
+          // null désactive la date future inventée par le résolveur Schema.org.
+          priceValidUntil: null,
           availability: product.value.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
           url: `/produits/${product.value.slug}`,
           itemCondition: 'https://schema.org/NewCondition'

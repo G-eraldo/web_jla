@@ -1,7 +1,35 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
+import { Readable } from 'node:stream'
 
-const { consumeQuota, enforceSameOrigin, reserveQuotas } = await import('../server/utils/request-security.js')
+const { consumeQuota, enforceSameOrigin, reserveQuotas, readLimitedJsonBody } = await import('../server/utils/request-security.js')
+
+test('le corps chunked est interrompu dès le dépassement, sans lire la suite', async () => {
+  stubGlobals({ siteUrl: 'https://maisonjla.fr' })
+  globalThis.setResponseHeader = (event, name, value) => { event.responseHeaders[name] = value }
+  let reads = 0
+  const req = Readable.from((async function* () {
+    reads++; yield Buffer.from('{"a":"')
+    reads++; yield Buffer.alloc(32, 'a')
+    for (let index = 0; index < 100; index++) {
+      reads++; yield Buffer.alloc(100_000, 'a')
+    }
+  })(), { highWaterMark: 1 })
+  const event = { headers: {}, node: { req }, responseHeaders: {} }
+  await assert.rejects(readLimitedJsonBody(event, 16), error => error.statusCode === 413)
+  assert.equal(event.responseHeaders.Connection, 'close')
+  assert.ok(reads <= 3)
+  assert.equal(req.destroyed, false, 'la réponse HTTP peut encore être envoyée')
+  req.destroy()
+})
+
+test('un corps fragmenté valide est décodé et la taille est mesurée en octets', async () => {
+  stubGlobals({ siteUrl: 'https://maisonjla.fr' })
+  const raw = Buffer.from('{"nom":"été"}')
+  const event = () => ({ headers: {}, responseHeaders: {}, node: { req: Readable.from([raw.subarray(0, 10), raw.subarray(10)]) } })
+  assert.deepEqual(await readLimitedJsonBody(event(), raw.length), { nom: 'été' })
+  await assert.rejects(readLimitedJsonBody(event(), raw.length - 1), error => error.statusCode === 413)
+})
 
 function stubGlobals({ siteUrl }) {
   globalThis.useRuntimeConfig = () => ({ public: { siteUrl } })
