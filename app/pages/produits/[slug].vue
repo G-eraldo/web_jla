@@ -63,7 +63,15 @@ useSchemaOrg([
           priceValidUntil: null,
           availability: product.value.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
           url: `/produits/${product.value.slug}`,
-          itemCondition: 'https://schema.org/NewCondition'
+          itemCondition: 'https://schema.org/NewCondition',
+          hasMerchantReturnPolicy: {
+            '@type': 'MerchantReturnPolicy',
+            applicableCountry: 'FR',
+            returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+            merchantReturnDays: 14,
+            returnMethod: 'https://schema.org/ReturnByMail',
+            returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility'
+          }
         })
       : undefined
   })
