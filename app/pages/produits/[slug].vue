@@ -135,7 +135,7 @@ useSchemaOrg([
           <NuxtLink v-if="added" to="/checkout" class="mt-2 flex min-h-12 items-center justify-center border border-[#302722] px-5 text-sm transition hover:bg-[#f3e9e2]">Finaliser ma commande →</NuxtLink>
           <div class="mt-5 grid grid-cols-2 divide-x divide-[#e9ddd3] border-y border-[#e9ddd3] py-4 text-center">
             <div class="px-3"><ShieldCheck class="mx-auto h-5 w-5 text-[#986c35]" /><p class="mt-2 text-[10px] leading-4 text-[#776b64]">Paiement sécurisé<br>avec Mollie</p></div>
-            <div class="px-3"><PackageCheck class="mx-auto h-5 w-5 text-[#986c35]" /><p class="mt-2 text-[10px] leading-4 text-[#776b64]">Livraison offerte<br>dès 60 €</p></div>
+            <div class="px-3"><PackageCheck class="mx-auto h-5 w-5 text-[#986c35]" /><p class="mt-2 text-[10px] leading-4 text-[#776b64]">Livraison offerte<br>dès 80 €</p></div>
           </div>
 
           <div class="divide-y divide-[#e9ddd3] border-b border-[#e9ddd3]">
@@ -144,7 +144,7 @@ useSchemaOrg([
                 <span>Livraison & retours</span><ChevronDown class="h-4 w-4 shrink-0 text-[#986c35] transition-transform group-open:rotate-180" />
               </summary>
               <div class="pb-6 text-xs leading-6 text-[#776b64]">
-                <p>Livraison à domicile ou en point relais, offerte dès 60 € d’achat. Vous disposez de 14 jours à compter du lendemain de la réception pour vous rétracter, sans motif. Les frais de retour sont à votre charge.</p>
+                <p>Livraison à domicile ou en point relais, offerte dès 80 € d’achat. Vous disposez de 14 jours à compter du lendemain de la réception pour vous rétracter, sans motif. Les frais de retour sont à votre charge.</p>
                 <NuxtLink to="/livraison" class="mt-2 inline-flex min-h-8 items-center underline underline-offset-4">Voir les délais et modalités</NuxtLink>
               </div>
             </details>

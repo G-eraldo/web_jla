@@ -1,4 +1,4 @@
-export const FREE_SHIPPING_THRESHOLD = 60
+export const FREE_SHIPPING_THRESHOLD = 80
 
 export const SHIPPING_PRICES = Object.freeze({
   home: 7.9,

@@ -30,7 +30,7 @@ watch(() => route.fullPath, () => {
 <template>
   <header class="sticky top-0 z-40 border-b border-[#e9ddd3] bg-[#fffaf6]/95 backdrop-blur-md">
     <div class="bg-[#302722] px-4 py-2.5 text-center text-[10px] tracking-[.12em] text-[#fffaf6] sm:text-xs">
-      <NuxtLink to="/livraison">Livraison offerte dès 60 € d’achat <span class="hidden sm:inline">— à domicile ou en
+      <NuxtLink to="/livraison">Livraison offerte dès 80 € d’achat <span class="hidden sm:inline">— à domicile ou en
           point relais</span></NuxtLink>
     </div>
     <div class="relative mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8 md:h-24">

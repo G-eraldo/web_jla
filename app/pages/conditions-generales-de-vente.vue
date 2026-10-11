@@ -14,7 +14,7 @@ useSeoMeta({
     <article class="mx-auto max-w-3xl text-sm leading-7 text-[#514640]">
       <p class="text-xs uppercase tracking-[.2em] text-[#9b712d]">Maison JLA</p>
       <h1 class="mt-4 font-serif text-5xl text-[#302722] sm:text-6xl">Conditions générales de vente</h1>
-      <p class="mt-6 text-[#776b64]">Version en vigueur au 11 septembre 2026.</p>
+      <p class="mt-6 text-[#776b64]">Version en vigueur au 11 octobre 2026.</p>
       <p class="mt-8">Les présentes conditions générales de vente encadrent les commandes de bijoux proposées par Maison
         JLA à des consommateurs en France métropolitaine. La commande s’effectue sans création de compte.</p>
 
@@ -63,8 +63,8 @@ useSeoMeta({
             Touret bénéficie de la franchise en base de TVA : <strong>TVA non applicable, article 293 B du Code général
               des impôts</strong>. Les prix affichés correspondent donc au prix net à payer, hors frais de livraison.
           </p>
-          <p class="mt-4">Les frais de livraison sont affichés avant paiement. En dessous de 60 € de produits, ils sont
-            de 3,90 € en point relais et de 7,90 € à domicile. La livraison est offerte dès 60 € de produits. Le montant
+          <p class="mt-4">Les frais de livraison sont affichés avant paiement. En dessous de 80 € de produits, ils sont
+            de 3,90 € en point relais et de 7,90 € à domicile. La livraison est offerte dès 80 € de produits. Le montant
             total dû est présenté dans le récapitulatif avant la validation.</p>
         </section>
 
