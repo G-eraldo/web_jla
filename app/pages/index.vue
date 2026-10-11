@@ -1,4 +1,6 @@
 <script setup>
+import { isOctobreRoseProduct, isRegularCatalogProduct } from '~/lib/octobre-rose'
+
 definePageMeta({ layout: 'default' })
 useSeoMeta({
   title: 'Bijoux fantaisie à porter au quotidien',
@@ -14,13 +16,14 @@ const categories = computed(() => [
   { slug: 'boucles', name: 'Boucles d’oreilles', note: 'Une touche d’éclat' },
   { slug: 'bracelets', name: 'Bracelets', note: 'Au fil des gestes' },
   { slug: 'bagues', name: 'Bagues', note: 'Le détail qui change tout' },
-].map(category => ({ ...category, image: products.value?.find(product => product.categorySlug === category.slug)?.image })))
+].map(category => ({ ...category, image: products.value?.find(product => isRegularCatalogProduct(product) && product.categorySlug === category.slug)?.image })))
 const selection = computed(() => {
-  const available = (products.value || []).filter(product => product.stock > 0)
+  const available = (products.value || []).filter(product => isRegularCatalogProduct(product) && product.stock > 0)
   const distinct = categories.value.map(category => available.find(product => product.categorySlug === category.slug)).filter(Boolean)
   return [...distinct, ...available.filter(product => !distinct.includes(product))].slice(0, 4)
 })
 const hero = computed(() => selection.value.find(product => product.categorySlug === 'colliers') || selection.value[0])
+const octobreRoseProduct = computed(() => (products.value || []).find(isOctobreRoseProduct))
 </script>
 
 <template>
@@ -54,6 +57,33 @@ const hero = computed(() => selection.value.find(product => product.categorySlug
           sécurisé avec Mollie</span><span>Livraison offerte dès 80 € d’achat</span><span>Confirmation de commande
           par e-mail</span></div>
     </div>
+
+    <section id="octobre-rose" aria-labelledby="octobre-rose-title" class="scroll-mt-32 px-5 pt-14 sm:px-8 sm:pt-20">
+      <div class="mx-auto grid max-w-7xl overflow-hidden bg-[#f7e9e9] lg:grid-cols-[1.05fr_.95fr]">
+        <div class="flex flex-col justify-center px-7 py-12 sm:px-12 sm:py-16 lg:px-16 lg:py-20">
+          <p class="w-fit border border-[#a76578] px-3 py-2 text-[10px] font-medium uppercase tracking-[.2em] text-[#81465b]">Édition limitée · Octobre Rose</p>
+          <h2 id="octobre-rose-title" class="mt-7 max-w-xl font-serif text-4xl leading-[1.15] sm:text-5xl">Un bracelet pour <span class="italic text-[#a76578]">porter le soutien.</span></h2>
+          <p class="mt-6 max-w-lg text-sm leading-7 text-[#665758]">Pour Octobre Rose, Maison JLA a imaginé un bracelet en édition limitée, à porter tout près de soi ou à offrir.</p>
+          <div class="mt-8 border-l-2 border-[#a76578] pl-5">
+            <p class="text-sm leading-6 text-[#45383a]">Une partie des bénéfices de cette édition sera reversée à une association engagée dans la lutte contre le cancer du sein.</p>
+            <p class="mt-2 text-xs leading-5 text-[#75666a]">L’association bénéficiaire et la part reversée seront précisées prochainement.</p>
+          </div>
+          <NuxtLink v-if="octobreRoseProduct" :to="`/produits/${octobreRoseProduct.slug}`"
+            class="mt-8 inline-flex min-h-12 w-fit items-center gap-6 bg-[#81465b] px-6 py-3 text-xs text-white transition hover:bg-[#69394a]">Découvrir le bracelet <span aria-hidden="true">→</span></NuxtLink>
+        </div>
+        <div class="relative flex min-h-64 items-center justify-center overflow-hidden bg-[#edd3d7] px-8 py-14 sm:min-h-80 lg:min-h-full">
+          <NuxtImg v-if="octobreRoseProduct" :src="octobreRoseProduct.image" format="webp" :alt="octobreRoseProduct.name" width="960" height="960" sizes="100vw lg:50vw" densities="1x 2x" loading="lazy"
+            class="absolute inset-0 h-full w-full object-cover" />
+          <div v-else aria-hidden="true" class="absolute -right-20 -top-20 h-72 w-72 rounded-full border border-white/60 sm:h-96 sm:w-96"></div>
+          <div v-if="!octobreRoseProduct" aria-hidden="true" class="absolute -bottom-28 -left-16 h-72 w-72 rounded-full border border-white/60 sm:h-96 sm:w-96"></div>
+          <svg v-if="!octobreRoseProduct" aria-hidden="true" class="relative h-44 w-36 text-[#a76578] drop-shadow-[0_12px_15px_rgba(95,49,67,.12)] sm:h-56 sm:w-44" viewBox="0 0 180 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M90 29C60 29 44 51 44 79c0 35 28 73 46 95 18-22 46-60 46-95 0-28-16-50-46-50Z" stroke="currentColor" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M45 198c16-27 32-53 45-75 13 22 29 48 45 75" stroke="currentColor" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span v-if="!octobreRoseProduct" aria-hidden="true" class="absolute bottom-7 font-serif text-2xl italic text-[#81465b] sm:bottom-10 sm:text-3xl">Octobre Rose</span>
+        </div>
+      </div>
+    </section>
 
     <section class="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20">
       <div class="mb-8 text-center">

@@ -1,5 +1,6 @@
 <script setup>
 import { collectionPage, collectionSeo, COLLECTION_SEO } from '~/lib/seo'
+import { isRegularCatalogProduct } from '~/lib/octobre-rose'
 
 definePageMeta({ layout: 'default', key: route => route.path })
 const route = useRoute()
@@ -36,7 +37,8 @@ const normalize = value => String(value).normalize('NFD').replace(/[\u0300-\u036
 const filteredProducts = computed(() => {
   const query = normalize(search.value.trim())
   const result = (products.value || []).filter(product =>
-    (route.params.slug === 'tous-les-bijoux' || product.categorySlug === route.params.slug)
+    isRegularCatalogProduct(product)
+    && (route.params.slug === 'tous-les-bijoux' || product.categorySlug === route.params.slug)
     && (!availableOnly.value || product.stock > 0)
     && (!query || normalize(`${product.name} ${product.category}`).includes(query))
   )

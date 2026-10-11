@@ -1,6 +1,7 @@
 <script setup>
 import { Check, ChevronDown, PackageCheck, ShieldCheck, ShoppingBag } from 'lucide-vue-next'
 import { productSeoDescription } from '~/lib/seo'
+import { isOctobreRoseProduct, isRegularCatalogProduct } from '~/lib/octobre-rose'
 
 definePageMeta({ key: route => route.params.slug })
 
@@ -19,8 +20,12 @@ const quantityInCart = computed(() => cart.items.find(item => item.id === produc
 const available = computed(() => Math.max(0, (product.value?.stock || 0) - quantityInCart.value))
 const gallery = computed(() => product.value?.images?.length ? product.value.images : product.value?.image ? [product.value.image] : [])
 const categories = { colliers: 'Colliers', boucles: 'Boucles d’oreilles', bracelets: 'Bracelets', bagues: 'Bagues' }
-const category = computed(() => categories[product.value?.categorySlug] ? { label: categories[product.value.categorySlug], to: `/collections/${product.value.categorySlug}` } : { label: 'Tous les bijoux', to: '/collections/tous-les-bijoux' })
-const suggestions = computed(() => (products.value || []).filter(item => item.id !== product.value?.id && item.stock > 0).sort((a, b) => Number(b.categorySlug === product.value?.categorySlug) - Number(a.categorySlug === product.value?.categorySlug)).slice(0, 4))
+const category = computed(() => isOctobreRoseProduct(product.value)
+  ? { label: 'Octobre Rose', to: '/#octobre-rose' }
+  : categories[product.value?.categorySlug]
+    ? { label: categories[product.value.categorySlug], to: `/collections/${product.value.categorySlug}` }
+    : { label: 'Tous les bijoux', to: '/collections/tous-les-bijoux' })
+const suggestions = computed(() => (products.value || []).filter(item => item.id !== product.value?.id && isRegularCatalogProduct(item) && item.stock > 0).sort((a, b) => Number(b.categorySlug === product.value?.categorySlug) - Number(a.categorySlug === product.value?.categorySlug)).slice(0, 4))
 const money = value => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(value)
 function addToCart() {
   if (!product.value || available.value < 1) return
@@ -113,6 +118,7 @@ useSchemaOrg([
             <p v-if="product.stock > 0" class="flex items-center gap-2 text-[10px] uppercase tracking-[.14em] text-[#64704f]"><span class="h-1.5 w-1.5 rounded-full bg-[#78805e]" />En stock</p>
           </div>
           <h1 class="mt-5 font-serif text-4xl leading-[1.04] tracking-[-.02em] text-[#302722] sm:text-5xl xl:text-[3.5rem]">{{ product.name }}</h1>
+          <p v-if="isOctobreRoseProduct(product)" class="mt-4 w-fit border border-[#a76578] px-3 py-2 text-[10px] font-medium uppercase tracking-[.16em] text-[#81465b]">Édition limitée · Octobre Rose</p>
           <p class="mt-4 text-lg text-[#514137]">{{ money(product.price) }}</p>
           <p class="mt-3 text-xs leading-6 text-[#776b64]">Garantie légale de conformité de deux ans et garantie des vices cachés. Aucune garantie commerciale n’est proposée. Vous disposez de 14 jours à compter du lendemain de la réception pour vous rétracter, sans motif ; les frais de retour sont à votre charge. <NuxtLink class="underline underline-offset-4" to="/retractation">Exercer mon droit de rétractation</NuxtLink>.</p>
           <p class="mt-7 whitespace-pre-line text-sm leading-7 text-[#776b64]">{{ product.description }}</p>

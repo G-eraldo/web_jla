@@ -1,4 +1,6 @@
 <script setup>
+import { isOctobreRoseProduct } from '~/lib/octobre-rose'
+
 defineProps({ product: { type: Object, required: true } })
 const money = value => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(value)
 </script>
@@ -10,8 +12,11 @@ const money = value => new Intl.NumberFormat('fr-FR', { style: 'currency', curre
       <NuxtImg :src="product.image" format="webp" :alt="product.name" loading="lazy" decoding="async" width="640" height="800" sizes="50vw md:33vw lg:25vw xl:300px" densities="1x 2x"
         class="aspect-[4/5] w-full object-cover transition-transform duration-500 motion-safe:group-hover:scale-[1.035]"
         :class="{ 'opacity-65': product.stock < 1 }" />
+      <span v-if="isOctobreRoseProduct(product)"
+        class="absolute left-2 top-2 bg-[#fff5f6]/95 px-2.5 py-2 text-[9px] font-medium uppercase tracking-[.12em] text-[#81465b] sm:left-3 sm:top-3">Édition limitée · Octobre Rose</span>
       <span v-if="product.stock < 1"
-        class="absolute left-2 top-2 bg-[#fffaf5]/95 px-2.5 py-2 text-[9px] uppercase tracking-widest text-[#78695f] sm:left-3 sm:top-3">Épuisé</span>
+        class="absolute left-2 bg-[#fffaf5]/95 px-2.5 py-2 text-[9px] uppercase tracking-widest text-[#78695f] sm:left-3"
+        :class="isOctobreRoseProduct(product) ? 'bottom-3' : 'top-2 sm:top-3'">Épuisé</span>
       <span aria-hidden="true"
         class="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-[#fffaf5]/95 text-[#382b25] transition-transform group-hover:translate-x-0.5"><svg
           class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
