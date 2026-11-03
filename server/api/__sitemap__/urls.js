@@ -1,4 +1,4 @@
-import { fetchAllStrapiPages } from '../../../app/lib/strapi-pagination.js'
+import { fetchAllStrapiPages } from '~/lib/strapi-pagination'
 
 export default defineSitemapEventHandler(async () => {
   const config = useRuntimeConfig()
