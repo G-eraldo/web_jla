@@ -21,7 +21,7 @@ test('la CSP utilise un nonce différent par requête et autorise les scripts Nu
   const policy = event.headers['Content-Security-Policy']
   const scriptPolicy = policy.split('; ').find(value => value.startsWith('script-src '))
   assert.ok(!scriptPolicy.includes('unsafe-inline'))
-  assert.match(policy, /script-src-attr 'none'/)
+  assert.match(policy, /script-src-attr 'unsafe-hashes' 'sha256-bwK6T5wZVTANitXbrTsel7kl\/PyCjCd\/Dq5Qoz3imjM='/)
   assert.notEqual(event.context.cspNonce, other.context.cspNonce)
   assert.ok(scriptPolicy.includes(`'nonce-${event.context.cspNonce}'`))
 
