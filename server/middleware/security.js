@@ -24,7 +24,7 @@ export default defineEventHandler((event) => {
     "font-src 'self'",
     "style-src 'self' 'unsafe-inline'",
     `script-src 'self' 'nonce-${nonce}'`,
-    "script-src-attr 'none'",
+    "script-src-attr 'unsafe-hashes' 'sha256-bwK6T5wZVTANitXbrTsel7kl/PyCjCd/Dq5Qoz3imjM='",
     `connect-src ${connectSrc}`,
     "upgrade-insecure-requests",
   ].join("; ");
