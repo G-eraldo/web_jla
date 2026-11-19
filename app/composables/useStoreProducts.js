@@ -10,6 +10,8 @@ export function useStoreProducts() {
     boucles: "boucles",
     bracelet: "bracelets",
     bracelets: "bracelets",
+    parure: "parures",
+    parures: "parures",
     bague: "bagues",
     bagues: "bagues",
   };

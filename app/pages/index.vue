@@ -14,6 +14,8 @@ const categories = computed(() => [
   { slug: 'boucles', name: 'Boucles d’oreilles', note: 'Une touche d’éclat' },
   { slug: 'bracelets', name: 'Bracelets', note: 'Au fil des gestes' },
   { slug: 'bagues', name: 'Bagues', note: 'Le détail qui change tout' },
+  ...(products.value?.some(product => product.categorySlug === 'parures')
+    ? [{ slug: 'parures', name: 'Parures', note: 'Les bijoux assortis' }] : []),
 ].map(category => ({ ...category, image: products.value?.find(product => product.categorySlug === category.slug)?.image })))
 const selection = computed(() => {
   const available = (products.value || []).filter(product => product.stock > 0)
@@ -63,7 +65,7 @@ const hero = computed(() => selection.value.find(product => product.categorySlug
         <p class="text-[10px] uppercase tracking-[.22em] text-[#9b712d]">À chaque envie, son bijou</p>
         <h2 class="mt-3 font-serif text-3xl sm:text-4xl">Et vous, plutôt…</h2>
       </div>
-      <div class="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+      <div class="grid grid-cols-2 gap-4 sm:gap-6" :class="categories.length === 5 ? 'lg:grid-cols-5' : 'lg:grid-cols-4'">
         <NuxtLink v-for="category in categories" :key="category.slug" :to="`/collections/${category.slug}`"
           class="group">
           <div class="aspect-[4/5] overflow-hidden rounded-t-full bg-[#f2e9e2]">

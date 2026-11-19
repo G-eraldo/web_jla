@@ -53,6 +53,7 @@ import { LockKeyhole, Package, Truck } from 'lucide-vue-next';
         </NuxtLink>
         <NuxtLink to="/collections/bagues" class="block py-2 text-sm hover:underline underline-offset-4">Bagues
         </NuxtLink>
+        <NuxtLink to="/collections/parures" class="block py-2 text-sm hover:underline underline-offset-4">Parures</NuxtLink>
       </nav>
       <nav aria-label="Informations du pied de page">
         <h2 class="mb-4 text-[10px] uppercase tracking-[.2em] text-[#776b64]">À vos côtés</h2>

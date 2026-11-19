@@ -18,7 +18,7 @@ const selectedImage = ref(0)
 const quantityInCart = computed(() => cart.items.find(item => item.id === product.value?.id)?.quantity || 0)
 const available = computed(() => Math.max(0, (product.value?.stock || 0) - quantityInCart.value))
 const gallery = computed(() => product.value?.images?.length ? product.value.images : product.value?.image ? [product.value.image] : [])
-const categories = { colliers: 'Colliers', boucles: 'Boucles d’oreilles', bracelets: 'Bracelets', bagues: 'Bagues' }
+const categories = { colliers: 'Colliers', boucles: 'Boucles d’oreilles', bracelets: 'Bracelets', bagues: 'Bagues', parures: 'Parures' }
 const category = computed(() => categories[product.value?.categorySlug]
     ? { label: categories[product.value.categorySlug], to: `/collections/${product.value.categorySlug}` }
     : { label: 'Tous les bijoux', to: '/collections/tous-les-bijoux' })

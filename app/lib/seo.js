@@ -23,13 +23,18 @@ export const COLLECTION_SEO = {
     title: 'Bagues',
     description: 'Bagues réglables Maison JLA en acier inoxydable doré. Comparez les modèles, les détails visibles et les prix.',
     intro: 'Les bagues Maison JLA actuellement proposées sont réglables et en acier inoxydable doré. Consultez leur fiche pour voir chaque modèle, son prix et sa disponibilité.'
+  },
+  parures: {
+    title: 'Parures',
+    description: 'Découvrez les parures Maison JLA et les bijoux assortis qui composent chaque ensemble.',
+    intro: 'Retrouvez les bijoux assortis de Maison JLA. Chaque fiche détaille les pièces de la parure et leur composition.'
   }
 }
 
 export const COLLECTION_SLUGS = Object.keys(COLLECTION_SEO)
 
 export function collectionSeo(slug) {
-  return COLLECTION_SEO[slug] || null
+  return Object.hasOwn(COLLECTION_SEO, slug) ? COLLECTION_SEO[slug] : null
 }
 
 export function collectionPage(value) {

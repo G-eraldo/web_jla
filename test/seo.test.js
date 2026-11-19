@@ -4,7 +4,7 @@ import { collectionPage, collectionSeo, COLLECTION_SLUGS, productSeoDescription 
 import { fetchAllStrapiPages } from '../app/lib/strapi-pagination.js'
 
 test('chaque collection publique a un titre et une description distincts', () => {
-  assert.deepEqual(COLLECTION_SLUGS, ['tous-les-bijoux', 'colliers', 'boucles', 'bracelets', 'bagues'])
+  assert.deepEqual(COLLECTION_SLUGS, ['tous-les-bijoux', 'colliers', 'boucles', 'bracelets', 'bagues', 'parures'])
   const descriptions = new Set(COLLECTION_SLUGS.map(slug => collectionSeo(slug).description))
   assert.equal(descriptions.size, COLLECTION_SLUGS.length)
   assert.equal(collectionSeo('inconnu'), null)
